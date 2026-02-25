@@ -2,7 +2,7 @@
 import { COLORS, FONTS, TABS } from "@/lib/constants";
 import { formatNumber } from "@/lib/calculos";
 
-export default function Sidebar({ tab, setTab, itensCount, tc }) {
+export default function Sidebar({ tab, setTab, itensCount, tc, onBack, isSaving, orcamentoNome }) {
     return (
         <div
             style={{
@@ -14,54 +14,97 @@ export default function Sidebar({ tab, setTab, itensCount, tc }) {
                 flexShrink: 0,
             }}
         >
-            {/* Logo */}
+            {/* Logo + Back */}
             <div
                 style={{
                     padding: "10px 8px",
                     borderBottom: `1px solid ${COLORS.border}`,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 5,
                 }}
             >
-                <div
-                    style={{
-                        width: 22,
-                        height: 22,
-                        borderRadius: 4,
-                        background: "linear-gradient(135deg,#F59E0B,#D97706)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: COLORS.bg,
-                        fontSize: 10,
-                        fontWeight: 800,
-                        fontFamily: FONTS.mono,
-                    }}
-                >
-                    Q
-                </div>
-                <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                    {onBack && (
+                        <button
+                            onClick={onBack}
+                            style={{
+                                background: "transparent",
+                                border: "none",
+                                color: COLORS.textDim,
+                                cursor: "pointer",
+                                fontSize: 14,
+                                padding: "2px 4px",
+                                borderRadius: 4,
+                            }}
+                            title="Voltar ao Dashboard"
+                        >
+                            ←
+                        </button>
+                    )}
                     <div
                         style={{
+                            width: 22,
+                            height: 22,
+                            borderRadius: 4,
+                            background: "linear-gradient(135deg,#F59E0B,#D97706)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: COLORS.bg,
                             fontSize: 10,
                             fontWeight: 800,
                             fontFamily: FONTS.mono,
-                            letterSpacing: "1px",
                         }}
                     >
-                        QUANTISA
+                        Q
                     </div>
-                    <div
-                        style={{
-                            fontSize: 6,
-                            color: COLORS.textMuted,
-                            letterSpacing: "1.5px",
-                        }}
-                    >
-                        ORÇAMENTO
+                    <div>
+                        <div
+                            style={{
+                                fontSize: 10,
+                                fontWeight: 800,
+                                fontFamily: FONTS.mono,
+                                letterSpacing: "1px",
+                            }}
+                        >
+                            QUANTISA
+                        </div>
+                        <div
+                            style={{
+                                fontSize: 6,
+                                color: COLORS.textMuted,
+                                letterSpacing: "1.5px",
+                            }}
+                        >
+                            ORÇAMENTO
+                        </div>
                     </div>
                 </div>
+                {/* Orçamento name + save status */}
+                {orcamentoNome && (
+                    <div
+                        style={{
+                            marginTop: 6,
+                            fontSize: 8,
+                            color: COLORS.textDim,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                        }}
+                    >
+                        {orcamentoNome}
+                    </div>
+                )}
+                {isSaving !== undefined && (
+                    <div
+                        style={{
+                            marginTop: 4,
+                            fontSize: 7,
+                            color: isSaving ? COLORS.accent : COLORS.green,
+                            fontFamily: FONTS.mono,
+                        }}
+                    >
+                        {isSaving ? "⏳ Salvando..." : "✓ Salvo"}
+                    </div>
+                )}
             </div>
 
             {/* Nav items */}

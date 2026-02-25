@@ -1,222 +1,429 @@
 "use client";
-import { useState, useMemo, useCallback } from "react";
-import { COLORS, DEFAULT_HEADER, DEFAULT_MAT_FIX, DEFAULT_EQUIPES, DEFAULT_OUTROS_CUSTOS, DEFAULT_RESUMO_FIX } from "@/lib/constants";
-import { parseComposition } from "@/lib/parser";
-import Sidebar from "@/components/Sidebar";
-import TabImportar from "@/components/TabImportar";
-import TabCusto from "@/components/TabCusto";
-import TabMateriais from "@/components/TabMateriais";
-import TabHistograma from "@/components/TabHistograma";
-import TabSimulacoes from "@/components/TabSimulacoes";
-import TabResumo from "@/components/TabResumo";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { COLORS, FONTS, GOOGLE_FONTS_URL } from "@/lib/constants";
+import { listarOrcamentos, criarOrcamento, excluirOrcamento } from "@/lib/supabaseOrcamento";
 
-export default function Home() {
-  // --- State ---
-  const [tab, setTab] = useState("custo");
-  const [header, setHeader] = useState({ ...DEFAULT_HEADER });
-  const [itens, setItens] = useState([]);
-  const [compText, setCompText] = useState("");
-  const [parsed, setParsed] = useState(null);
-  const [editP, setEditP] = useState(null);
-  const [impHist, setImpHist] = useState([]);
-  const [matFix, setMatFix] = useState([...DEFAULT_MAT_FIX]);
-  const [equipes, setEquipes] = useState(DEFAULT_EQUIPES.map((g) => ({ ...g, l: g.l.map((f) => ({ ...f })) })));
-  const [oc, setOc] = useState([...DEFAULT_OUTROS_CUSTOS]);
-  const [resumoFix, setResumoFix] = useState([...DEFAULT_RESUMO_FIX]);
+export default function Dashboard() {
+  const router = useRouter();
+  const [orcamentos, setOrcamentos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showNew, setShowNew] = useState(false);
+  const [newNome, setNewNome] = useState("");
+  const [newCliente, setNewCliente] = useState("");
+  const [creating, setCreating] = useState(false);
 
-  // --- Computed Items (with totals per row) ---
-  const ci = useMemo(
-    () =>
-      itens.map((it) => ({
-        ...it,
-        mT: it.m * it.q,
-        moT: it.mo * it.q,
-        eT: it.e * it.q,
-        tot: (it.m + it.mo + it.e) * it.q,
-      })),
-    [itens]
-  );
-
-  // --- Totals ---
-  const tc = useMemo(() => {
-    const m = ci.reduce((s, it) => s + it.mT, 0);
-    const mo = ci.reduce((s, it) => s + it.moT, 0);
-    const e = ci.reduce((s, it) => s + it.eT, 0);
-    const hp = ci.reduce((s, it) => s + it.hp * it.q, 0);
-    const ha = ci.reduce((s, it) => s + it.ha * it.q, 0);
-    return { m, mo, e, t: m + mo + e, hp, ha, ci };
-  }, [ci]);
-
-  // --- Total Materials Fix ---
-  const tmf = useMemo(() => matFix.reduce((s, m) => s + m.q * m.p, 0), [matFix]);
-
-  // --- Actions ---
-  const doParse = useCallback(() => {
-    const result = parseComposition(compText);
-    if (result && result.parsed) {
-      setParsed(result);
-      setEditP({ ...result });
-    } else {
-      setParsed(null);
-      setEditP(null);
-      alert("Não foi possível extrair dados. Verifique se o texto está no formato V4 completo.");
+  // Load list
+  const loadList = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await listarOrcamentos();
+      setOrcamentos(data);
+    } catch (err) {
+      setError(err.message || "Erro ao carregar orçamentos");
+    } finally {
+      setLoading(false);
     }
-  }, [compText]);
-
-  const confirmImport = useCallback(() => {
-    if (!editP) return;
-    const newItem = {
-      id: Date.now().toString(),
-      n: editP.codigo || `C${itens.length + 1}`,
-      d: editP.titulo || "Composição importada",
-      u: editP.unidade || "m²",
-      q: 1,
-      m: editP.mat,
-      mo: editP.mo,
-      e: editP.eq,
-      hp: editP.hhp,
-      ha: editP.hha,
-    };
-    setItens((p) => [...p, newItem]);
-    setImpHist((p) => [...p, { ...editP }]);
-    setParsed(null);
-    setEditP(null);
-    setCompText("");
-    setTab("custo");
-  }, [editP, itens.length]);
-
-  const addI = useCallback(() => {
-    setItens((p) => [
-      ...p,
-      {
-        id: Date.now().toString(),
-        n: "",
-        d: "",
-        u: "m²",
-        q: 0,
-        m: 0,
-        mo: 0,
-        e: 0,
-        hp: 0,
-        ha: 0,
-      },
-    ]);
   }, []);
 
-  const uI = useCallback((id, key, val) => {
-    setItens((p) => p.map((it) => (it.id === id ? { ...it, [key]: val } : it)));
-  }, []);
+  useEffect(() => {
+    loadList();
+  }, [loadList]);
 
-  const dI = useCallback((id) => {
-    setItens((p) => p.filter((it) => it.id !== id));
-  }, []);
+  // Create new
+  const handleCreate = async () => {
+    if (!newNome.trim()) return;
+    try {
+      setCreating(true);
+      const orc = await criarOrcamento({
+        nome: newNome.trim(),
+        cliente: newCliente.trim() || null,
+      });
+      router.push(`/orcamento/${orc.id}`);
+    } catch (err) {
+      alert("Erro ao criar: " + (err.message || err));
+      setCreating(false);
+    }
+  };
 
-  const addMF = useCallback(() => {
-    setMatFix((p) => [
-      ...p,
-      { id: "f" + Date.now(), n: "", i: "", u: "un", q: 1, p: 0 },
-    ]);
-  }, []);
+  // Delete
+  const handleDelete = async (id, nome) => {
+    if (!confirm(`Excluir "${nome}"? Todos os dados serão perdidos.`)) return;
+    try {
+      await excluirOrcamento(id);
+      setOrcamentos((prev) => prev.filter((o) => o.id !== id));
+    } catch (err) {
+      alert("Erro ao excluir: " + (err.message || err));
+    }
+  };
 
-  const dMF = useCallback((id) => {
-    setMatFix((p) => p.filter((x) => x.id !== id));
-  }, []);
+  const formatDate = (d) => {
+    if (!d) return "—";
+    try {
+      return new Date(d).toLocaleDateString("pt-BR");
+    } catch {
+      return d;
+    }
+  };
 
-  const addOC = useCallback(() => {
-    setOc((p) => [...p, { id: "o" + Date.now(), d: "", u: "un", q: 0, v: 0 }]);
-  }, []);
-
-  const dOC = useCallback((id) => {
-    setOc((p) => p.filter((x) => x.id !== id));
-  }, []);
-
-  // --- Render ---
   return (
-    <div
-      style={{
-        display: "flex",
-        height: "100vh",
-        background: COLORS.bg,
-        color: COLORS.text,
-      }}
-    >
-      <Sidebar
-        tab={tab}
-        setTab={setTab}
-        itensCount={itens.length}
-        tc={tc}
-      />
-
+    <>
+      <link href={GOOGLE_FONTS_URL} rel="stylesheet" />
       <div
         style={{
-          flex: 1,
-          overflowY: "auto",
-          padding: 16,
+          minHeight: "100vh",
+          background: COLORS.bg,
+          color: COLORS.text,
+          fontFamily: FONTS.sans,
+          padding: "40px 24px",
         }}
       >
-        {tab === "importar" && (
-          <TabImportar
-            compText={compText}
-            setCompText={setCompText}
-            parsed={parsed}
-            editP={editP}
-            setEditP={setEditP}
-            doParse={doParse}
-            confirmImport={confirmImport}
-            impHist={impHist}
-            setParsed={setParsed}
-          />
-        )}
-        {tab === "custo" && (
-          <TabCusto
-            header={header}
-            setHeader={setHeader}
-            ci={ci}
-            tc={tc}
-            itens={itens}
-            setTab={setTab}
-            addI={addI}
-            uI={uI}
-            dI={dI}
-          />
-        )}
-        {tab === "materiais" && (
-          <TabMateriais
-            matFix={matFix}
-            setMatFix={setMatFix}
-            tmf={tmf}
-            addMF={addMF}
-            dMF={dMF}
-          />
-        )}
-        {tab === "histograma" && (
-          <TabHistograma
-            equipes={equipes}
-            setEquipes={setEquipes}
-            tc={tc}
-            oc={oc}
-            setOc={setOc}
-            addOC={addOC}
-            dOC={dOC}
-          />
-        )}
-        {tab === "simulacoes" && (
-          <TabSimulacoes
-            totalMatDireto={tc.m + tmf}
-            totalMODireto={tc.mo}
-          />
-        )}
-        {tab === "resumo" && (
-          <TabResumo
-            resumoFix={resumoFix}
-            setResumoFix={setResumoFix}
-            tc={tc}
-            tmf={tmf}
-            equipes={equipes}
-            oc={oc}
-          />
-        )}
+        {/* Header */}
+        <div
+          style={{
+            maxWidth: 960,
+            margin: "0 auto",
+            marginBottom: 40,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 8 }}>
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 12,
+                background: `linear-gradient(135deg, ${COLORS.accent}, ${COLORS.accent2})`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 24,
+                fontWeight: 800,
+                color: COLORS.bg,
+                fontFamily: FONTS.mono,
+              }}
+            >
+              Q
+            </div>
+            <div>
+              <h1
+                style={{
+                  fontSize: 28,
+                  fontWeight: 800,
+                  margin: 0,
+                  background: `linear-gradient(90deg, ${COLORS.accent}, ${COLORS.accent2})`,
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                QUANTISA
+              </h1>
+              <p style={{ margin: 0, fontSize: 13, color: COLORS.textDim, fontFamily: FONTS.mono }}>
+                Sistema de Orçamentação
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div style={{ maxWidth: 960, margin: "0 auto" }}>
+          {/* New Budget Button / Form */}
+          {!showNew ? (
+            <button
+              onClick={() => setShowNew(true)}
+              style={{
+                width: "100%",
+                padding: "18px 24px",
+                background: COLORS.surface,
+                border: `2px dashed ${COLORS.border}`,
+                borderRadius: 12,
+                color: COLORS.accent,
+                fontSize: 15,
+                fontWeight: 600,
+                fontFamily: FONTS.sans,
+                cursor: "pointer",
+                marginBottom: 24,
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.borderColor = COLORS.accent;
+                e.target.style.background = COLORS.accent + "10";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.borderColor = COLORS.border;
+                e.target.style.background = COLORS.surface;
+              }}
+            >
+              + Novo Orçamento
+            </button>
+          ) : (
+            <div
+              style={{
+                background: COLORS.surface,
+                border: `1px solid ${COLORS.accent}40`,
+                borderRadius: 12,
+                padding: 24,
+                marginBottom: 24,
+              }}
+            >
+              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: COLORS.accent }}>
+                Novo Orçamento
+              </h3>
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                <input
+                  placeholder="Nome do orçamento *"
+                  value={newNome}
+                  onChange={(e) => setNewNome(e.target.value)}
+                  style={{
+                    flex: "2 1 200px",
+                    padding: "10px 14px",
+                    background: COLORS.bg,
+                    border: `1px solid ${COLORS.border}`,
+                    borderRadius: 8,
+                    color: COLORS.text,
+                    fontSize: 14,
+                    fontFamily: FONTS.sans,
+                    outline: "none",
+                  }}
+                  onFocus={(e) => (e.target.style.borderColor = COLORS.accent)}
+                  onBlur={(e) => (e.target.style.borderColor = COLORS.border)}
+                  onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+                  autoFocus
+                />
+                <input
+                  placeholder="Cliente"
+                  value={newCliente}
+                  onChange={(e) => setNewCliente(e.target.value)}
+                  style={{
+                    flex: "1 1 150px",
+                    padding: "10px 14px",
+                    background: COLORS.bg,
+                    border: `1px solid ${COLORS.border}`,
+                    borderRadius: 8,
+                    color: COLORS.text,
+                    fontSize: 14,
+                    fontFamily: FONTS.sans,
+                    outline: "none",
+                  }}
+                  onFocus={(e) => (e.target.style.borderColor = COLORS.accent)}
+                  onBlur={(e) => (e.target.style.borderColor = COLORS.border)}
+                  onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+                />
+                <button
+                  onClick={handleCreate}
+                  disabled={creating || !newNome.trim()}
+                  style={{
+                    padding: "10px 24px",
+                    background: creating ? COLORS.textMuted : COLORS.accent,
+                    border: "none",
+                    borderRadius: 8,
+                    color: COLORS.bg,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    fontFamily: FONTS.sans,
+                    cursor: creating ? "wait" : "pointer",
+                    opacity: !newNome.trim() ? 0.4 : 1,
+                  }}
+                >
+                  {creating ? "Criando..." : "Criar"}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowNew(false);
+                    setNewNome("");
+                    setNewCliente("");
+                  }}
+                  style={{
+                    padding: "10px 16px",
+                    background: "transparent",
+                    border: `1px solid ${COLORS.border}`,
+                    borderRadius: 8,
+                    color: COLORS.textDim,
+                    fontSize: 14,
+                    fontFamily: FONTS.sans,
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Error */}
+          {error && (
+            <div
+              style={{
+                padding: "12px 16px",
+                background: COLORS.red + "15",
+                border: `1px solid ${COLORS.red}40`,
+                borderRadius: 8,
+                color: COLORS.red,
+                fontSize: 13,
+                marginBottom: 16,
+              }}
+            >
+              ⚠️ {error}
+              <button
+                onClick={loadList}
+                style={{
+                  marginLeft: 12,
+                  padding: "4px 12px",
+                  background: COLORS.red + "20",
+                  border: "none",
+                  borderRadius: 4,
+                  color: COLORS.red,
+                  cursor: "pointer",
+                  fontSize: 12,
+                }}
+              >
+                Tentar novamente
+              </button>
+            </div>
+          )}
+
+          {/* Loading */}
+          {loading && (
+            <div style={{ textAlign: "center", padding: 60, color: COLORS.textDim }}>
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  border: `3px solid ${COLORS.border}`,
+                  borderTopColor: COLORS.accent,
+                  borderRadius: "50%",
+                  animation: "spin 0.8s linear infinite",
+                  margin: "0 auto 12px",
+                }}
+              />
+              Carregando orçamentos...
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && !error && orcamentos.length === 0 && (
+            <div style={{ textAlign: "center", padding: 80, color: COLORS.textMuted }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+              <p style={{ fontSize: 16, fontWeight: 600, marginBottom: 4, color: COLORS.textDim }}>
+                Nenhum orçamento cadastrado
+              </p>
+              <p style={{ fontSize: 13 }}>Clique em "Novo Orçamento" para começar.</p>
+            </div>
+          )}
+
+          {/* Cards Grid */}
+          {!loading && orcamentos.length > 0 && (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                gap: 16,
+              }}
+            >
+              {orcamentos.map((orc) => (
+                <div
+                  key={orc.id}
+                  onClick={() => router.push(`/orcamento/${orc.id}`)}
+                  style={{
+                    background: COLORS.surface,
+                    border: `1px solid ${COLORS.border}`,
+                    borderRadius: 12,
+                    padding: 20,
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    position: "relative",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = COLORS.accent + "60";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow = `0 8px 24px ${COLORS.accent}10`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = COLORS.border;
+                    e.currentTarget.style.transform = "none";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  {/* Delete Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(orc.id, orc.nome);
+                    }}
+                    style={{
+                      position: "absolute",
+                      top: 12,
+                      right: 12,
+                      width: 28,
+                      height: 28,
+                      borderRadius: 6,
+                      background: "transparent",
+                      border: `1px solid transparent`,
+                      color: COLORS.textMuted,
+                      fontSize: 14,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "all 0.15s",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = COLORS.red + "15";
+                      e.target.style.borderColor = COLORS.red + "40";
+                      e.target.style.color = COLORS.red;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = "transparent";
+                      e.target.style.borderColor = "transparent";
+                      e.target.style.color = COLORS.textMuted;
+                    }}
+                    title="Excluir orçamento"
+                  >
+                    ✕
+                  </button>
+
+                  <h3
+                    style={{
+                      margin: "0 0 6px",
+                      fontSize: 16,
+                      fontWeight: 700,
+                      color: COLORS.text,
+                      paddingRight: 28,
+                    }}
+                  >
+                    {orc.nome}
+                  </h3>
+
+                  {orc.cliente && (
+                    <p style={{ margin: "0 0 12px", fontSize: 13, color: COLORS.textDim }}>
+                      {orc.cliente}
+                    </p>
+                  )}
+
+                  <div style={{ display: "flex", gap: 16, fontSize: 12, color: COLORS.textMuted, fontFamily: FONTS.mono }}>
+                    <span>{formatDate(orc.data)}</span>
+                    <span>Rev. {orc.revisao || "00"}</span>
+                  </div>
+
+                  {orc.proponente && (
+                    <div style={{ marginTop: 12, fontSize: 11, color: COLORS.textMuted }}>
+                      {orc.proponente}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Spin animation */}
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
-    </div>
+    </>
   );
 }
