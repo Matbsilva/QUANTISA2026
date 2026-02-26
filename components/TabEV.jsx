@@ -75,9 +75,9 @@ export default function TabEV({ ci, tc }) {
     if (!ci || ci.length === 0) {
         return (
             <div style={{ textAlign: "center", padding: 40, color: COLORS.textMuted }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>💡</div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Engenharia de Valor</div>
-                <div style={{ fontSize: 11, marginTop: 6 }}>
+                <div style={{ fontSize: 48, marginBottom: 12 }}>💡</div>
+                <div style={{ fontSize: 18, fontWeight: 600 }}>Engenharia de Valor</div>
+                <div style={{ fontSize: 15, marginTop: 6 }}>
                     Adicione itens na aba Custo para a IA sugerir alternativas.
                 </div>
             </div>
@@ -87,7 +87,7 @@ export default function TabEV({ ci, tc }) {
     return (
         <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <h2 style={{ fontSize: 15, fontWeight: 700, margin: 0, fontFamily: FONTS.mono }}>
+                <h2 style={{ fontSize: 19, fontWeight: 700, margin: 0, fontFamily: FONTS.mono }}>
                     💡 Engenharia de Valor
                 </h2>
                 <button
@@ -99,7 +99,7 @@ export default function TabEV({ ci, tc }) {
                         border: "none",
                         background: loading ? COLORS.textMuted : `linear-gradient(135deg, ${COLORS.accent}, ${COLORS.accent2})`,
                         color: COLORS.bg,
-                        fontSize: 11,
+                        fontSize: 15,
                         fontWeight: 700,
                         cursor: loading ? "wait" : "pointer",
                     }}
@@ -114,7 +114,7 @@ export default function TabEV({ ci, tc }) {
                 border: `1px solid rgba(59,130,246,0.2)`,
                 borderRadius: 8,
                 marginBottom: 14,
-                fontSize: 10,
+                fontSize: 14,
                 color: COLORS.textDim,
             }}>
                 A Engenharia de Valor analisa os <b style={{ color: COLORS.red }}>{classeA.length} itens Classe A</b> (que representam ~80% do custo) e sugere 3 alternativas para cada: <b>Padrão</b>, <b>Econômico</b> e <b>Premium</b>.
@@ -127,7 +127,7 @@ export default function TabEV({ ci, tc }) {
                     border: `1px solid ${COLORS.red}40`,
                     borderRadius: 6,
                     marginBottom: 10,
-                    fontSize: 10,
+                    fontSize: 14,
                     color: COLORS.red,
                 }}>
                     ⚠️ {error}
@@ -135,7 +135,7 @@ export default function TabEV({ ci, tc }) {
             )}
 
             {/* Itens Classe A (always shown) */}
-            <h3 style={{ fontSize: 11, fontWeight: 700, color: COLORS.red, fontFamily: FONTS.mono, marginBottom: 6 }}>
+            <h3 style={{ fontSize: 15, fontWeight: 700, color: COLORS.red, fontFamily: FONTS.mono, marginBottom: 6 }}>
                 Itens Classe A (foco da análise)
             </h3>
             <div style={{ border: `1px solid ${COLORS.border}`, borderRadius: 6, overflow: "hidden", marginBottom: 14 }}>
@@ -146,7 +146,7 @@ export default function TabEV({ ci, tc }) {
                                 <th key={i} style={{
                                     padding: "5px 8px",
                                     textAlign: i === 2 ? "right" : "left",
-                                    fontSize: 8,
+                                    fontSize: 12,
                                     fontWeight: 700,
                                     color: COLORS.red,
                                     background: COLORS.surface,
@@ -159,9 +159,9 @@ export default function TabEV({ ci, tc }) {
                     <tbody>
                         {classeA.map((it) => (
                             <tr key={it.id}>
-                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10, fontFamily: FONTS.mono }}>{it.n}</td>
-                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10 }}>{it.d}</td>
-                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10, textAlign: "right", fontFamily: FONTS.mono, fontWeight: 600, color: COLORS.accent2 }}>{formatCurrency(it.tot)}</td>
+                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14, fontFamily: FONTS.mono }}>{it.n}</td>
+                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14 }}>{it.d}</td>
+                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14, textAlign: "right", fontFamily: FONTS.mono, fontWeight: 600, color: COLORS.accent2 }}>{formatCurrency(it.tot)}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -171,7 +171,7 @@ export default function TabEV({ ci, tc }) {
             {/* EV Results */}
             {evData && evData.length > 0 && (
                 <div>
-                    <h3 style={{ fontSize: 12, fontWeight: 700, color: COLORS.accent, fontFamily: FONTS.mono, marginBottom: 8 }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: COLORS.accent, fontFamily: FONTS.mono, marginBottom: 8 }}>
                         🤖 Alternativas Sugeridas pela IA
                     </h3>
                     {evData.map((item, idx) => (
@@ -184,7 +184,7 @@ export default function TabEV({ ci, tc }) {
                             <div style={{
                                 padding: "8px 12px",
                                 background: "#1A1710",
-                                fontSize: 11,
+                                fontSize: 15,
                                 fontWeight: 700,
                                 color: COLORS.accent,
                                 fontFamily: FONTS.mono,
@@ -201,10 +201,10 @@ export default function TabEV({ ci, tc }) {
                                             style={{
                                                 padding: 10,
                                                 borderRight: aIdx < 2 ? `1px solid ${COLORS.border}` : "none",
-                                                fontSize: 9,
+                                                fontSize: 13,
                                             }}
                                         >
-                                            <div style={{ fontWeight: 700, color: altColors[aIdx], marginBottom: 6, fontSize: 10 }}>
+                                            <div style={{ fontWeight: 700, color: altColors[aIdx], marginBottom: 6, fontSize: 14 }}>
                                                 {alt.tipo || altLabels[aIdx]}
                                             </div>
                                             <div style={{ color: COLORS.textDim, marginBottom: 4 }}>{alt.especificacao}</div>
@@ -217,10 +217,10 @@ export default function TabEV({ ci, tc }) {
                                                 )}
                                             </div>
                                             {alt.vantagens && alt.vantagens.map((v, i) => (
-                                                <div key={i} style={{ color: COLORS.green, fontSize: 8 }}>✅ {v}</div>
+                                                <div key={i} style={{ color: COLORS.green, fontSize: 12 }}>✅ {v}</div>
                                             ))}
                                             {alt.desvantagens && alt.desvantagens.map((d, i) => (
-                                                <div key={i} style={{ color: COLORS.red, fontSize: 8 }}>❌ {d}</div>
+                                                <div key={i} style={{ color: COLORS.red, fontSize: 12 }}>❌ {d}</div>
                                             ))}
                                         </div>
                                     );

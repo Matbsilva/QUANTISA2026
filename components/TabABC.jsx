@@ -45,9 +45,9 @@ export default function TabABC({ ci, tc }) {
     if (ranked.length === 0) {
         return (
             <div style={{ textAlign: "center", padding: 40, color: COLORS.textMuted }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>🎯</div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Análise ABC</div>
-                <div style={{ fontSize: 11, marginTop: 6 }}>
+                <div style={{ fontSize: 48, marginBottom: 12 }}>🎯</div>
+                <div style={{ fontSize: 18, fontWeight: 600 }}>Análise ABC</div>
+                <div style={{ fontSize: 15, marginTop: 6 }}>
                     Adicione itens na aba Custo para gerar a análise Pareto 80/20.
                 </div>
             </div>
@@ -56,7 +56,7 @@ export default function TabABC({ ci, tc }) {
 
     return (
         <div>
-            <h2 style={{ fontSize: 15, fontWeight: 700, margin: "0 0 12px", fontFamily: FONTS.mono }}>
+            <h2 style={{ fontSize: 19, fontWeight: 700, margin: "0 0 12px", fontFamily: FONTS.mono }}>
                 🎯 Análise ABC — Pareto 80/20
             </h2>
 
@@ -79,16 +79,16 @@ export default function TabABC({ ci, tc }) {
                                 padding: 12,
                             }}
                         >
-                            <div style={{ fontSize: 10, fontWeight: 700, color: c.color, fontFamily: FONTS.mono }}>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: c.color, fontFamily: FONTS.mono }}>
                                 {c.label}
                             </div>
-                            <div style={{ fontSize: 18, fontWeight: 800, color: c.color, fontFamily: FONTS.mono, margin: "4px 0" }}>
+                            <div style={{ fontSize: 22, fontWeight: 800, color: c.color, fontFamily: FONTS.mono, margin: "4px 0" }}>
                                 {c.items.length} {c.items.length === 1 ? "item" : "itens"}
                             </div>
-                            <div style={{ fontSize: 11, color: COLORS.accent2, fontFamily: FONTS.mono }}>
+                            <div style={{ fontSize: 15, color: COLORS.accent2, fontFamily: FONTS.mono }}>
                                 {formatCurrency(cTotal)} ({cPct}%)
                             </div>
-                            <div style={{ fontSize: 8, color: COLORS.textMuted, marginTop: 4 }}>
+                            <div style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 4 }}>
                                 {c.desc}
                             </div>
                         </div>
@@ -107,7 +107,7 @@ export default function TabABC({ ci, tc }) {
                                     style={{
                                         padding: "6px 8px",
                                         textAlign: i >= 4 ? "right" : "left",
-                                        fontSize: 8,
+                                        fontSize: 12,
                                         fontWeight: 700,
                                         color: COLORS.accent,
                                         background: COLORS.surface,
@@ -123,12 +123,12 @@ export default function TabABC({ ci, tc }) {
                     <tbody>
                         {ranked.map((r) => (
                             <tr key={r.id} style={{ background: classeBg[r.classe] }}>
-                                <td style={{ padding: "5px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10, fontFamily: FONTS.mono, fontWeight: 700 }}>
+                                <td style={{ padding: "5px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14, fontFamily: FONTS.mono, fontWeight: 700 }}>
                                     {r.rank}º
                                 </td>
                                 <td style={{ padding: "5px 8px", borderBottom: `1px solid ${COLORS.border}` }}>
                                     <span style={{
-                                        fontSize: 9,
+                                        fontSize: 13,
                                         fontWeight: 800,
                                         color: classeColors[r.classe],
                                         background: classeColors[r.classe] + "20",
@@ -139,37 +139,37 @@ export default function TabABC({ ci, tc }) {
                                         {r.classe}
                                     </span>
                                 </td>
-                                <td style={{ padding: "5px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10, fontFamily: FONTS.mono, color: COLORS.textDim }}>
+                                <td style={{ padding: "5px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14, fontFamily: FONTS.mono, color: COLORS.textDim }}>
                                     {r.n}
                                 </td>
-                                <td style={{ padding: "5px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10 }}>
+                                <td style={{ padding: "5px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14 }}>
                                     {r.d}
                                 </td>
-                                <td style={{ padding: "5px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10, textAlign: "right", fontFamily: FONTS.mono, fontWeight: 600, color: COLORS.accent2 }}>
+                                <td style={{ padding: "5px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14, textAlign: "right", fontFamily: FONTS.mono, fontWeight: 600, color: COLORS.accent2 }}>
                                     {formatCurrency(r.tot)}
                                 </td>
-                                <td style={{ padding: "5px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10, textAlign: "right", fontFamily: FONTS.mono, color: COLORS.textDim }}>
+                                <td style={{ padding: "5px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14, textAlign: "right", fontFamily: FONTS.mono, color: COLORS.textDim }}>
                                     {r.pct.toFixed(1)}%
                                 </td>
-                                <td style={{ padding: "5px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10, textAlign: "right", fontFamily: FONTS.mono, fontWeight: r.accPct <= 80 ? 700 : 400, color: r.accPct <= 80 ? COLORS.red : COLORS.textDim }}>
+                                <td style={{ padding: "5px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14, textAlign: "right", fontFamily: FONTS.mono, fontWeight: r.accPct <= 80 ? 700 : 400, color: r.accPct <= 80 ? COLORS.red : COLORS.textDim }}>
                                     {r.accPct.toFixed(1)}%
                                 </td>
                             </tr>
                         ))}
                         <tr style={{ background: COLORS.surface }}>
-                            <td colSpan={4} style={{ padding: "6px 8px", fontSize: 10, fontWeight: 700, borderTop: `2px solid ${COLORS.accent}` }}>TOTAL</td>
-                            <td style={{ padding: "6px 8px", fontSize: 11, fontWeight: 800, textAlign: "right", fontFamily: FONTS.mono, color: COLORS.accent, borderTop: `2px solid ${COLORS.accent}` }}>
+                            <td colSpan={4} style={{ padding: "6px 8px", fontSize: 14, fontWeight: 700, borderTop: `2px solid ${COLORS.accent}` }}>TOTAL</td>
+                            <td style={{ padding: "6px 8px", fontSize: 15, fontWeight: 800, textAlign: "right", fontFamily: FONTS.mono, color: COLORS.accent, borderTop: `2px solid ${COLORS.accent}` }}>
                                 {formatCurrency(total)}
                             </td>
-                            <td colSpan={2} style={{ padding: "6px 8px", fontSize: 10, fontWeight: 700, textAlign: "right", borderTop: `2px solid ${COLORS.accent}` }}>100%</td>
+                            <td colSpan={2} style={{ padding: "6px 8px", fontSize: 14, fontWeight: 700, textAlign: "right", borderTop: `2px solid ${COLORS.accent}` }}>100%</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
             {/* Recommendations */}
-            <div style={{ marginTop: 12, padding: 10, background: "rgba(59,130,246,0.08)", border: `1px solid rgba(59,130,246,0.2)`, borderRadius: 8, fontSize: 9, color: COLORS.textDim, lineHeight: 1.7 }}>
-                <div style={{ fontWeight: 700, color: COLORS.blue, marginBottom: 4, fontSize: 10 }}>📌 Recomendações</div>
+            <div style={{ marginTop: 12, padding: 10, background: "rgba(59,130,246,0.08)", border: `1px solid rgba(59,130,246,0.2)`, borderRadius: 8, fontSize: 13, color: COLORS.textDim, lineHeight: 1.7 }}>
+                <div style={{ fontWeight: 700, color: COLORS.blue, marginBottom: 4, fontSize: 14 }}>📌 Recomendações</div>
                 <div>• <b>Classe A</b> ({classeA.length} itens = {total > 0 ? ((classeA.reduce((s, r) => s + r.tot, 0) / total) * 100).toFixed(0) : 0}%): Focar 50% do tempo técnico, qualidade máxima, inspeção rigorosa</div>
                 <div>• <b>Classe B</b> ({classeB.length} itens): Atenção normal, 30% do tempo técnico</div>
                 <div>• <b>Classe C</b> ({classeC.length} itens): Monitorar, 20% do tempo técnico, processo mais ágil</div>

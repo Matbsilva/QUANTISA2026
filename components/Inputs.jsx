@@ -22,7 +22,7 @@ export function NumericInput({ value, onChange, w }) {
                 border: `1px solid ${COLORS.border}`,
                 borderRadius: 3,
                 color: COLORS.accent2,
-                fontSize: 10,
+                fontSize: 14,
                 fontFamily: FONTS.mono,
                 outline: "none",
                 textAlign: "right",
@@ -48,7 +48,7 @@ export function TextInput({ value, onChange, placeholder, w }) {
                 border: `1px solid ${COLORS.border}`,
                 borderRadius: 3,
                 color: COLORS.text,
-                fontSize: 10,
+                fontSize: 14,
                 fontFamily: FONTS.sans,
                 outline: "none",
             }}

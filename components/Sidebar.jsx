@@ -30,7 +30,7 @@ export default function Sidebar({ tab, setTab, itensCount, tc, onBack, isSaving,
                                 border: "none",
                                 color: COLORS.textDim,
                                 cursor: "pointer",
-                                fontSize: 14,
+                                fontSize: 18,
                                 padding: "2px 4px",
                                 borderRadius: 4,
                             }}
@@ -49,7 +49,7 @@ export default function Sidebar({ tab, setTab, itensCount, tc, onBack, isSaving,
                             alignItems: "center",
                             justifyContent: "center",
                             color: COLORS.bg,
-                            fontSize: 10,
+                            fontSize: 14,
                             fontWeight: 800,
                             fontFamily: FONTS.mono,
                         }}
@@ -59,7 +59,7 @@ export default function Sidebar({ tab, setTab, itensCount, tc, onBack, isSaving,
                     <div>
                         <div
                             style={{
-                                fontSize: 10,
+                                fontSize: 14,
                                 fontWeight: 800,
                                 fontFamily: FONTS.mono,
                                 letterSpacing: "1px",
@@ -69,7 +69,7 @@ export default function Sidebar({ tab, setTab, itensCount, tc, onBack, isSaving,
                         </div>
                         <div
                             style={{
-                                fontSize: 6,
+                                fontSize: 8,
                                 color: COLORS.textMuted,
                                 letterSpacing: "1.5px",
                             }}
@@ -83,7 +83,7 @@ export default function Sidebar({ tab, setTab, itensCount, tc, onBack, isSaving,
                     <div
                         style={{
                             marginTop: 6,
-                            fontSize: 8,
+                            fontSize: 12,
                             color: COLORS.textDim,
                             overflow: "hidden",
                             textOverflow: "ellipsis",
@@ -97,7 +97,7 @@ export default function Sidebar({ tab, setTab, itensCount, tc, onBack, isSaving,
                     <div
                         style={{
                             marginTop: 4,
-                            fontSize: 7,
+                            fontSize: 9,
                             color: isSaving ? COLORS.accent : COLORS.green,
                             fontFamily: FONTS.mono,
                         }}
@@ -122,7 +122,7 @@ export default function Sidebar({ tab, setTab, itensCount, tc, onBack, isSaving,
                                     top: -5,
                                     left: 4,
                                     background: COLORS.surface,
-                                    fontSize: 6,
+                                    fontSize: 8,
                                     color: COLORS.textMuted,
                                     padding: "0 4px",
                                     letterSpacing: "1px",
@@ -157,7 +157,7 @@ export default function Sidebar({ tab, setTab, itensCount, tc, onBack, isSaving,
                                 <span
                                     style={{
                                         marginLeft: "auto",
-                                        fontSize: 8,
+                                        fontSize: 12,
                                         background: COLORS.accent,
                                         color: COLORS.bg,
                                         borderRadius: 8,
@@ -179,7 +179,7 @@ export default function Sidebar({ tab, setTab, itensCount, tc, onBack, isSaving,
                     style={{
                         padding: "6px 8px",
                         borderTop: `1px solid ${COLORS.border}`,
-                        fontSize: 7,
+                        fontSize: 9,
                         color: COLORS.textMuted,
                         lineHeight: 1.6,
                     }}

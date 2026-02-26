@@ -98,7 +98,7 @@ export default function Dashboard() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 24,
+                fontSize: 28,
                 fontWeight: 800,
                 color: COLORS.bg,
                 fontFamily: FONTS.mono,
@@ -109,7 +109,7 @@ export default function Dashboard() {
             <div>
               <h1
                 style={{
-                  fontSize: 28,
+                  fontSize: 36,
                   fontWeight: 800,
                   margin: 0,
                   background: `linear-gradient(90deg, ${COLORS.accent}, ${COLORS.accent2})`,
@@ -119,7 +119,7 @@ export default function Dashboard() {
               >
                 QUANTISA
               </h1>
-              <p style={{ margin: 0, fontSize: 13, color: COLORS.textDim, fontFamily: FONTS.mono }}>
+              <p style={{ margin: 0, fontSize: 17, color: COLORS.textDim, fontFamily: FONTS.mono }}>
                 Sistema de Orçamentação
               </p>
             </div>
@@ -139,7 +139,7 @@ export default function Dashboard() {
                 border: `2px dashed ${COLORS.border}`,
                 borderRadius: 12,
                 color: COLORS.accent,
-                fontSize: 15,
+                fontSize: 19,
                 fontWeight: 600,
                 fontFamily: FONTS.sans,
                 cursor: "pointer",
@@ -167,7 +167,7 @@ export default function Dashboard() {
                 marginBottom: 24,
               }}
             >
-              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: COLORS.accent }}>
+              <h3 style={{ margin: "0 0 16px", fontSize: 20, fontWeight: 700, color: COLORS.accent }}>
                 Novo Orçamento
               </h3>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
@@ -182,7 +182,7 @@ export default function Dashboard() {
                     border: `1px solid ${COLORS.border}`,
                     borderRadius: 8,
                     color: COLORS.text,
-                    fontSize: 14,
+                    fontSize: 18,
                     fontFamily: FONTS.sans,
                     outline: "none",
                   }}
@@ -202,7 +202,7 @@ export default function Dashboard() {
                     border: `1px solid ${COLORS.border}`,
                     borderRadius: 8,
                     color: COLORS.text,
-                    fontSize: 14,
+                    fontSize: 18,
                     fontFamily: FONTS.sans,
                     outline: "none",
                   }}
@@ -219,7 +219,7 @@ export default function Dashboard() {
                     border: "none",
                     borderRadius: 8,
                     color: COLORS.bg,
-                    fontSize: 14,
+                    fontSize: 18,
                     fontWeight: 700,
                     fontFamily: FONTS.sans,
                     cursor: creating ? "wait" : "pointer",
@@ -240,7 +240,7 @@ export default function Dashboard() {
                     border: `1px solid ${COLORS.border}`,
                     borderRadius: 8,
                     color: COLORS.textDim,
-                    fontSize: 14,
+                    fontSize: 18,
                     fontFamily: FONTS.sans,
                     cursor: "pointer",
                   }}
@@ -260,7 +260,7 @@ export default function Dashboard() {
                 border: `1px solid ${COLORS.red}40`,
                 borderRadius: 8,
                 color: COLORS.red,
-                fontSize: 13,
+                fontSize: 17,
                 marginBottom: 16,
               }}
             >
@@ -275,7 +275,7 @@ export default function Dashboard() {
                   borderRadius: 4,
                   color: COLORS.red,
                   cursor: "pointer",
-                  fontSize: 12,
+                  fontSize: 16,
                 }}
               >
                 Tentar novamente
@@ -304,11 +304,11 @@ export default function Dashboard() {
           {/* Empty State */}
           {!loading && !error && orcamentos.length === 0 && (
             <div style={{ textAlign: "center", padding: 80, color: COLORS.textMuted }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
-              <p style={{ fontSize: 16, fontWeight: 600, marginBottom: 4, color: COLORS.textDim }}>
+              <div style={{ fontSize: 62, marginBottom: 16 }}>📋</div>
+              <p style={{ fontSize: 20, fontWeight: 600, marginBottom: 4, color: COLORS.textDim }}>
                 Nenhum orçamento cadastrado
               </p>
-              <p style={{ fontSize: 13 }}>Clique em "Novo Orçamento" para começar.</p>
+              <p style={{ fontSize: 17 }}>Clique em "Novo Orçamento" para começar.</p>
             </div>
           )}
 
@@ -361,7 +361,7 @@ export default function Dashboard() {
                       background: "transparent",
                       border: `1px solid transparent`,
                       color: COLORS.textMuted,
-                      fontSize: 14,
+                      fontSize: 18,
                       cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
@@ -386,7 +386,7 @@ export default function Dashboard() {
                   <h3
                     style={{
                       margin: "0 0 6px",
-                      fontSize: 16,
+                      fontSize: 20,
                       fontWeight: 700,
                       color: COLORS.text,
                       paddingRight: 28,
@@ -396,18 +396,18 @@ export default function Dashboard() {
                   </h3>
 
                   {orc.cliente && (
-                    <p style={{ margin: "0 0 12px", fontSize: 13, color: COLORS.textDim }}>
+                    <p style={{ margin: "0 0 12px", fontSize: 17, color: COLORS.textDim }}>
                       {orc.cliente}
                     </p>
                   )}
 
-                  <div style={{ display: "flex", gap: 16, fontSize: 12, color: COLORS.textMuted, fontFamily: FONTS.mono }}>
+                  <div style={{ display: "flex", gap: 16, fontSize: 16, color: COLORS.textMuted, fontFamily: FONTS.mono }}>
                     <span>{formatDate(orc.data)}</span>
                     <span>Rev. {orc.revisao || "00"}</span>
                   </div>
 
                   {orc.proponente && (
-                    <div style={{ marginTop: 12, fontSize: 11, color: COLORS.textMuted }}>
+                    <div style={{ marginTop: 12, fontSize: 15, color: COLORS.textMuted }}>
                       {orc.proponente}
                     </div>
                   )}

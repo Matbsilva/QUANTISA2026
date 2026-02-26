@@ -3,8 +3,8 @@ import { COLORS, FONTS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/calculos";
 import { NumericInput, TextInput } from "./Inputs";
 
-const thS = { padding: "5px 6px", textAlign: "left", fontSize: 8, fontWeight: 700, color: COLORS.accent, textTransform: "uppercase", letterSpacing: "0.3px", background: "#1A1710", borderBottom: "1px solid #2A2520", whiteSpace: "nowrap" };
-const tdS = { padding: "3px 5px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10 };
+const thS = { padding: "5px 6px", textAlign: "left", fontSize: 12, fontWeight: 700, color: COLORS.accent, textTransform: "uppercase", letterSpacing: "0.3px", background: "#1A1710", borderBottom: "1px solid #2A2520", whiteSpace: "nowrap" };
+const tdS = { padding: "3px 5px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14 };
 const tdrS = { ...tdS, textAlign: "right", fontFamily: FONTS.mono, color: COLORS.accent2 };
 const totR = { background: "#1A1710" };
 
@@ -12,8 +12,8 @@ export default function TabMateriais({ matFix, setMatFix, tmf, addMF, dMF }) {
     return (
         <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                <h2 style={{ fontSize: 15, fontWeight: 700, margin: 0, fontFamily: FONTS.mono }}>Materiais</h2>
-                <div style={{ fontSize: 14, fontWeight: 700, color: COLORS.accent, fontFamily: FONTS.mono }}>{formatCurrency(tmf)}</div>
+                <h2 style={{ fontSize: 19, fontWeight: 700, margin: 0, fontFamily: FONTS.mono }}>Materiais</h2>
+                <div style={{ fontSize: 18, fontWeight: 700, color: COLORS.accent, fontFamily: FONTS.mono }}>{formatCurrency(tmf)}</div>
             </div>
             <div style={{ border: `1px solid ${COLORS.border}`, borderRadius: 6, marginBottom: 8, overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -33,18 +33,18 @@ export default function TabMateriais({ matFix, setMatFix, tmf, addMF, dMF }) {
                                 <td style={tdS}><NumericInput value={m.q} onChange={(v) => setMatFix((p) => p.map((x) => x.id === m.id ? { ...x, q: v } : x))} /></td>
                                 <td style={tdS}><NumericInput value={m.p} onChange={(v) => setMatFix((p) => p.map((x) => x.id === m.id ? { ...x, p: v } : x))} /></td>
                                 <td style={tdrS}>{formatCurrency(m.q * m.p)}</td>
-                                <td style={tdS}><span onClick={() => dMF(m.id)} style={{ cursor: "pointer", color: COLORS.textMuted, fontSize: 8 }}>✕</span></td>
+                                <td style={tdS}><span onClick={() => dMF(m.id)} style={{ cursor: "pointer", color: COLORS.textMuted, fontSize: 12 }}>✕</span></td>
                             </tr>
                         ))}
                         <tr style={totR}>
-                            <td colSpan={5} style={{ ...tdS, textAlign: "right", fontWeight: 700, color: COLORS.accent, fontSize: 9 }}>Total</td>
+                            <td colSpan={5} style={{ ...tdS, textAlign: "right", fontWeight: 700, color: COLORS.accent, fontSize: 13 }}>Total</td>
                             <td style={{ ...tdrS, fontWeight: 700 }}>{formatCurrency(tmf)}</td>
                             <td style={tdS} />
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <button onClick={addMF} style={{ padding: "5px 12px", borderRadius: 5, border: "none", background: COLORS.accent, color: COLORS.bg, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>+ Item</button>
+            <button onClick={addMF} style={{ padding: "5px 12px", borderRadius: 5, border: "none", background: COLORS.accent, color: COLORS.bg, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>+ Item</button>
         </div>
     );
 }

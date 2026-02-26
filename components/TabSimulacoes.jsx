@@ -43,7 +43,7 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
         >
             <div
                 style={{
-                    fontSize: 10,
+                    fontSize: 14,
                     fontWeight: 700,
                     color: color,
                     marginBottom: 8,
@@ -52,7 +52,7 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
                 }}
             >
                 <span>{label}</span>
-                <span style={{ fontFamily: FONTS.mono, fontSize: 14 }}>
+                <span style={{ fontFamily: FONTS.mono, fontSize: 18 }}>
                     {(calcBDI(rates) * 100).toFixed(2)}%
                 </span>
             </div>
@@ -67,14 +67,14 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
                         borderBottom: `1px solid ${COLORS.border}`,
                     }}
                 >
-                    <span style={{ fontSize: 9, color: COLORS.textDim }}>{lb}</span>
+                    <span style={{ fontSize: 13, color: COLORS.textDim }}>{lb}</span>
                     <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
                         <NumericInput
                             value={rates[k]}
                             onChange={(v) => setRates((p) => ({ ...p, [k]: v }))}
                             w="45px"
                         />
-                        <span style={{ fontSize: 8, color: COLORS.textMuted }}>%</span>
+                        <span style={{ fontSize: 12, color: COLORS.textMuted }}>%</span>
                     </div>
                 </div>
             ))}
@@ -85,7 +85,7 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
         <div>
             <h2
                 style={{
-                    fontSize: 15,
+                    fontSize: 19,
                     fontWeight: 700,
                     margin: "0 0 10px",
                     fontFamily: FONTS.mono,
@@ -112,7 +112,7 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
             >
                 <div
                     style={{
-                        fontSize: 9,
+                        fontSize: 13,
                         fontWeight: 700,
                         color: COLORS.green,
                         marginBottom: 5,
@@ -127,7 +127,7 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
                         gap: 8,
                     }}
                 >
-                    <span style={{ fontSize: 9, color: COLORS.blue }}>MO {mix}%</span>
+                    <span style={{ fontSize: 13, color: COLORS.blue }}>MO {mix}%</span>
                     <input
                         type="range"
                         min={0}
@@ -136,7 +136,7 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
                         onChange={(e) => setMix(Number(e.target.value))}
                         style={{ flex: 1 }}
                     />
-                    <span style={{ fontSize: 9, color: COLORS.accent }}>
+                    <span style={{ fontSize: 13, color: COLORS.accent }}>
                         Mat {100 - mix}%
                     </span>
                 </div>
@@ -147,12 +147,12 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
                         marginTop: 6,
                     }}
                 >
-                    <span style={{ fontSize: 9, color: COLORS.textMuted }}>
+                    <span style={{ fontSize: 13, color: COLORS.textMuted }}>
                         BDI Mix Ponderado
                     </span>
                     <span
                         style={{
-                            fontSize: 14,
+                            fontSize: 18,
                             fontWeight: 700,
                             color: COLORS.green,
                             fontFamily: FONTS.mono,
@@ -174,7 +174,7 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
             >
                 <div
                     style={{
-                        fontSize: 10,
+                        fontSize: 14,
                         fontWeight: 700,
                         color: COLORS.accent,
                         marginBottom: 8,
@@ -191,7 +191,7 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
                                         key={i}
                                         style={{
                                             padding: "4px",
-                                            fontSize: 8,
+                                            fontSize: 12,
                                             fontWeight: 700,
                                             color: COLORS.textMuted,
                                             textAlign: "right",
@@ -242,7 +242,7 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
                                 <td
                                     style={{
                                         padding: "5px",
-                                        fontSize: 10,
+                                        fontSize: 14,
                                         color: c,
                                         fontWeight: i === 2 ? 700 : 400,
                                         borderBottom: `1px solid ${COLORS.border}`,
@@ -254,7 +254,7 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
                                     style={{
                                         padding: "5px",
                                         textAlign: "right",
-                                        fontSize: 10,
+                                        fontSize: 14,
                                         fontFamily: FONTS.mono,
                                         color: COLORS.textDim,
                                         borderBottom: `1px solid ${COLORS.border}`,
@@ -266,7 +266,7 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
                                     style={{
                                         padding: "5px",
                                         textAlign: "right",
-                                        fontSize: 10,
+                                        fontSize: 14,
                                         fontFamily: FONTS.mono,
                                         color: COLORS.textDim,
                                         borderBottom: `1px solid ${COLORS.border}`,
@@ -278,7 +278,7 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
                                     style={{
                                         padding: "5px",
                                         textAlign: "right",
-                                        fontSize: 10,
+                                        fontSize: 14,
                                         fontFamily: FONTS.mono,
                                         color: COLORS.green,
                                         borderBottom: `1px solid ${COLORS.border}`,
@@ -290,7 +290,7 @@ export default function TabSimulacoes({ totalMatDireto, totalMODireto }) {
                                     style={{
                                         padding: "5px",
                                         textAlign: "right",
-                                        fontSize: i === 2 ? 14 : 11,
+                                        fontSize: i === 2 ? 18 : 15,
                                         fontFamily: FONTS.mono,
                                         fontWeight: 700,
                                         color: c,

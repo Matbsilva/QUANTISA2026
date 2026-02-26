@@ -309,9 +309,9 @@ export default function OrcamentoPage() {
                         gap: 16,
                     }}
                 >
-                    <div style={{ fontSize: 48 }}>⚠️</div>
-                    <p style={{ fontSize: 16, fontWeight: 600 }}>Erro ao carregar orçamento</p>
-                    <p style={{ fontSize: 13, color: COLORS.textDim, maxWidth: 400, textAlign: "center" }}>
+                    <div style={{ fontSize: 62 }}>⚠️</div>
+                    <p style={{ fontSize: 20, fontWeight: 600 }}>Erro ao carregar orçamento</p>
+                    <p style={{ fontSize: 17, color: COLORS.textDim, maxWidth: 400, textAlign: "center" }}>
                         {loadError}
                     </p>
                     <div style={{ display: "flex", gap: 12 }}>

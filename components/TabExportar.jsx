@@ -105,9 +105,9 @@ export default function TabExportar({ ci, tc, tmf, equipes, oc, header }) {
     if (ci.length === 0) {
         return (
             <div style={{ textAlign: "center", padding: 40, color: COLORS.textMuted }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>📤</div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Exportar</div>
-                <div style={{ fontSize: 11, marginTop: 6 }}>Adicione itens na aba Custo primeiro.</div>
+                <div style={{ fontSize: 48, marginBottom: 12 }}>📤</div>
+                <div style={{ fontSize: 18, fontWeight: 600 }}>Exportar</div>
+                <div style={{ fontSize: 15, marginTop: 6 }}>Adicione itens na aba Custo primeiro.</div>
             </div>
         );
     }
@@ -115,7 +115,7 @@ export default function TabExportar({ ci, tc, tmf, equipes, oc, header }) {
     return (
         <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <h2 style={{ fontSize: 15, fontWeight: 700, margin: 0, fontFamily: FONTS.mono }}>
+                <h2 style={{ fontSize: 19, fontWeight: 700, margin: 0, fontFamily: FONTS.mono }}>
                     📤 Exportar — Preço de Venda
                 </h2>
                 <button
@@ -126,7 +126,7 @@ export default function TabExportar({ ci, tc, tmf, equipes, oc, header }) {
                         border: "none",
                         background: `linear-gradient(135deg, ${COLORS.green}, #16A34A)`,
                         color: "#fff",
-                        fontSize: 11,
+                        fontSize: 15,
                         fontWeight: 700,
                         cursor: "pointer",
                     }}
@@ -146,7 +146,7 @@ export default function TabExportar({ ci, tc, tmf, equipes, oc, header }) {
                 border: `1px solid ${COLORS.border}`,
                 alignItems: "center",
             }}>
-                <span style={{ fontSize: 10, color: COLORS.textDim, marginRight: 4 }}>Modo de Markup:</span>
+                <span style={{ fontSize: 14, color: COLORS.textDim, marginRight: 4 }}>Modo de Markup:</span>
                 {[
                     { id: "proporcional", label: "ABC Proporcional", desc: "A=23% B=35% C=40%" },
                     { id: "uniforme", label: "Uniforme", desc: `${markupUniforme}% tudo` },
@@ -161,7 +161,7 @@ export default function TabExportar({ ci, tc, tmf, equipes, oc, header }) {
                             border: markupMode === mode.id ? `1px solid ${COLORS.accent}` : `1px solid ${COLORS.border}`,
                             background: markupMode === mode.id ? COLORS.accent + "20" : "transparent",
                             color: markupMode === mode.id ? COLORS.accent : COLORS.textDim,
-                            fontSize: 9,
+                            fontSize: 13,
                             fontWeight: markupMode === mode.id ? 700 : 400,
                             cursor: "pointer",
                         }}
@@ -181,7 +181,7 @@ export default function TabExportar({ ci, tc, tmf, equipes, oc, header }) {
                             border: `1px solid ${COLORS.border}`,
                             borderRadius: 4,
                             color: COLORS.text,
-                            fontSize: 10,
+                            fontSize: 14,
                             fontFamily: FONTS.mono,
                             textAlign: "center",
                         }}
@@ -198,7 +198,7 @@ export default function TabExportar({ ci, tc, tmf, equipes, oc, header }) {
                                 <th key={i} style={{
                                     padding: "6px 8px",
                                     textAlign: i >= 2 ? "right" : "left",
-                                    fontSize: 8,
+                                    fontSize: 12,
                                     fontWeight: 700,
                                     color: COLORS.accent,
                                     background: COLORS.surface,
@@ -211,24 +211,24 @@ export default function TabExportar({ ci, tc, tmf, equipes, oc, header }) {
                     <tbody>
                         {pricing.map((p) => (
                             <tr key={p.id}>
-                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10, fontFamily: FONTS.mono }}>{p.n}</td>
-                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10 }}>{p.d}</td>
-                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10, textAlign: "right", fontFamily: FONTS.mono, color: COLORS.textDim }}>{formatCurrency(p.custo)}</td>
-                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10, textAlign: "right", fontFamily: FONTS.mono, color: COLORS.blue }}>{p.mkp}%</td>
-                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10, textAlign: "right", fontFamily: FONTS.mono, color: COLORS.green }}>{formatCurrency(p.mkpVal)}</td>
-                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 11, textAlign: "right", fontFamily: FONTS.mono, fontWeight: 700, color: COLORS.accent }}>{formatCurrency(p.venda)}</td>
-                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 10, textAlign: "right", fontFamily: FONTS.mono, color: COLORS.textMuted }}>
+                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14, fontFamily: FONTS.mono }}>{p.n}</td>
+                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14 }}>{p.d}</td>
+                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14, textAlign: "right", fontFamily: FONTS.mono, color: COLORS.textDim }}>{formatCurrency(p.custo)}</td>
+                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14, textAlign: "right", fontFamily: FONTS.mono, color: COLORS.blue }}>{p.mkp}%</td>
+                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14, textAlign: "right", fontFamily: FONTS.mono, color: COLORS.green }}>{formatCurrency(p.mkpVal)}</td>
+                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 15, textAlign: "right", fontFamily: FONTS.mono, fontWeight: 700, color: COLORS.accent }}>{formatCurrency(p.venda)}</td>
+                                <td style={{ padding: "4px 8px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14, textAlign: "right", fontFamily: FONTS.mono, color: COLORS.textMuted }}>
                                     {totalVenda > 0 ? ((p.venda / totalVenda) * 100).toFixed(1) : 0}%
                                 </td>
                             </tr>
                         ))}
                         <tr style={{ background: COLORS.surface }}>
-                            <td colSpan={2} style={{ padding: "6px 8px", fontSize: 10, fontWeight: 700, borderTop: `2px solid ${COLORS.accent}` }}>TOTAL</td>
-                            <td style={{ padding: "6px 8px", fontSize: 10, textAlign: "right", fontFamily: FONTS.mono, fontWeight: 600, borderTop: `2px solid ${COLORS.accent}` }}>{formatCurrency(totalCusto)}</td>
-                            <td style={{ padding: "6px 8px", fontSize: 10, textAlign: "right", fontFamily: FONTS.mono, fontWeight: 600, color: COLORS.blue, borderTop: `2px solid ${COLORS.accent}` }}>{markupMedio.toFixed(1)}%</td>
-                            <td style={{ padding: "6px 8px", fontSize: 10, textAlign: "right", fontFamily: FONTS.mono, fontWeight: 600, color: COLORS.green, borderTop: `2px solid ${COLORS.accent}` }}>{formatCurrency(totalVenda - totalCusto)}</td>
-                            <td style={{ padding: "6px 8px", fontSize: 12, textAlign: "right", fontFamily: FONTS.mono, fontWeight: 800, color: COLORS.accent, borderTop: `2px solid ${COLORS.accent}` }}>{formatCurrency(totalVenda)}</td>
-                            <td style={{ padding: "6px 8px", fontSize: 10, textAlign: "right", fontWeight: 700, borderTop: `2px solid ${COLORS.accent}` }}>100%</td>
+                            <td colSpan={2} style={{ padding: "6px 8px", fontSize: 14, fontWeight: 700, borderTop: `2px solid ${COLORS.accent}` }}>TOTAL</td>
+                            <td style={{ padding: "6px 8px", fontSize: 14, textAlign: "right", fontFamily: FONTS.mono, fontWeight: 600, borderTop: `2px solid ${COLORS.accent}` }}>{formatCurrency(totalCusto)}</td>
+                            <td style={{ padding: "6px 8px", fontSize: 14, textAlign: "right", fontFamily: FONTS.mono, fontWeight: 600, color: COLORS.blue, borderTop: `2px solid ${COLORS.accent}` }}>{markupMedio.toFixed(1)}%</td>
+                            <td style={{ padding: "6px 8px", fontSize: 14, textAlign: "right", fontFamily: FONTS.mono, fontWeight: 600, color: COLORS.green, borderTop: `2px solid ${COLORS.accent}` }}>{formatCurrency(totalVenda - totalCusto)}</td>
+                            <td style={{ padding: "6px 8px", fontSize: 16, textAlign: "right", fontFamily: FONTS.mono, fontWeight: 800, color: COLORS.accent, borderTop: `2px solid ${COLORS.accent}` }}>{formatCurrency(totalVenda)}</td>
+                            <td style={{ padding: "6px 8px", fontSize: 14, textAlign: "right", fontWeight: 700, borderTop: `2px solid ${COLORS.accent}` }}>100%</td>
                         </tr>
                     </tbody>
                 </table>
@@ -241,17 +241,17 @@ export default function TabExportar({ ci, tc, tmf, equipes, oc, header }) {
                 gap: 10,
             }}>
                 <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: 12, textAlign: "center" }}>
-                    <div style={{ fontSize: 8, color: COLORS.textMuted, textTransform: "uppercase", marginBottom: 4 }}>Custo Direto</div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: COLORS.textDim, fontFamily: FONTS.mono }}>{formatCurrency(totalCusto)}</div>
+                    <div style={{ fontSize: 12, color: COLORS.textMuted, textTransform: "uppercase", marginBottom: 4 }}>Custo Direto</div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: COLORS.textDim, fontFamily: FONTS.mono }}>{formatCurrency(totalCusto)}</div>
                 </div>
                 <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.green}30`, borderRadius: 8, padding: 12, textAlign: "center" }}>
-                    <div style={{ fontSize: 8, color: COLORS.textMuted, textTransform: "uppercase", marginBottom: 4 }}>Lucro Bruto</div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: COLORS.green, fontFamily: FONTS.mono }}>{formatCurrency(totalVenda - totalCusto)}</div>
-                    <div style={{ fontSize: 9, color: COLORS.textMuted }}>{markupMedio.toFixed(1)}%</div>
+                    <div style={{ fontSize: 12, color: COLORS.textMuted, textTransform: "uppercase", marginBottom: 4 }}>Lucro Bruto</div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: COLORS.green, fontFamily: FONTS.mono }}>{formatCurrency(totalVenda - totalCusto)}</div>
+                    <div style={{ fontSize: 13, color: COLORS.textMuted }}>{markupMedio.toFixed(1)}%</div>
                 </div>
                 <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.accent}30`, borderRadius: 8, padding: 12, textAlign: "center" }}>
-                    <div style={{ fontSize: 8, color: COLORS.textMuted, textTransform: "uppercase", marginBottom: 4 }}>Preço de Venda</div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: COLORS.accent, fontFamily: FONTS.mono }}>{formatCurrency(totalVenda)}</div>
+                    <div style={{ fontSize: 12, color: COLORS.textMuted, textTransform: "uppercase", marginBottom: 4 }}>Preço de Venda</div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: COLORS.accent, fontFamily: FONTS.mono }}>{formatCurrency(totalVenda)}</div>
                 </div>
             </div>
         </div>
