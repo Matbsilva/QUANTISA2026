@@ -2,6 +2,7 @@
 import { useState, useMemo } from "react";
 import { COLORS, FONTS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/calculos";
+import * as XLSX from "xlsx";
 
 /**
  * Aba Exportar — Gera planilha de preço de venda em Excel (CSV)
@@ -102,6 +103,65 @@ export default function TabExportar({ ci, tc, tmf, equipes, oc, header }) {
         URL.revokeObjectURL(url);
     };
 
+    // Export XLSX — multiple sheets
+    const exportXLSX = () => {
+        const wb = XLSX.utils.book_new();
+
+        // Sheet 1: Preço de Venda
+        const vendaData = [
+            ["PLANILHA DE PREÇO DE VENDA"],
+            [`Projeto: ${header?.nome || ""}`, `Cliente: ${header?.cliente || ""}`, `Data: ${header?.data || ""}`, `Rev: ${header?.rev || ""}`],
+            [],
+            ["Item", "Descrição", "Un", "Qtd", "Mat/Un", "MO/Un", "Eq/Un", "Custo Unit", "Custo Total", "Markup %", "Markup R$", "PREÇO VENDA"],
+            ...pricing.map(p => [
+                p.n, p.d, p.u, p.q, p.m, p.mo, p.e,
+                p.m + p.mo + p.e, p.custo, p.mkp / 100, p.mkpVal, p.venda,
+            ]),
+            [],
+            ["", "", "", "", "", "", "", "", "TOTAL", "", (totalVenda - totalCusto), totalVenda],
+        ];
+        const ws1 = XLSX.utils.aoa_to_sheet(vendaData);
+        ws1["!cols"] = [{ wch: 8 }, { wch: 40 }, { wch: 6 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 14 }];
+        XLSX.utils.book_append_sheet(wb, ws1, "Preço de Venda");
+
+        // Sheet 2: Tab Custo  
+        const custoData = [
+            ["TABELA DE CUSTO DIRETO"],
+            [],
+            ["#", "Descrição", "Un", "Qtd", "Mat/un", "MO/un", "Eq/un", "HH Prof", "HH Aju", "Mat Total", "MO Total", "Eq Total", "TOTAL"],
+            ...ci.map((it, i) => [
+                i + 1, it.d, it.u, it.q, it.m, it.mo, it.e, it.hp, it.ha,
+                it.mT, it.moT, it.eT, it.tot,
+            ]),
+            [],
+            ["", "", "", "", "", "", "", "", "TOTAL", tc.m, tc.mo, tc.e, tc.t],
+        ];
+        const ws2 = XLSX.utils.aoa_to_sheet(custoData);
+        ws2["!cols"] = [{ wch: 4 }, { wch: 40 }, { wch: 6 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 8 }, { wch: 8 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }];
+        XLSX.utils.book_append_sheet(wb, ws2, "Tab Custo");
+
+        // Sheet 3: Resumo Financeiro
+        const resumoData = [
+            ["RESUMO FINANCEIRO"],
+            [],
+            ["Descrição", "Valor (R$)"],
+            ["Custo Direto Itens", totalCusto],
+            ["M.O. Equipes", moEquipes],
+            ["Outros Custos", tOc],
+            ["Materiais Fixos", tmf],
+            ["CUSTO TOTAL", totalCusto + moEquipes + tOc + tmf],
+            [],
+            ["Markup Médio", markupMedio / 100],
+            ["PREÇO DE VENDA", totalVenda],
+            ["LUCRO BRUTO", totalVenda - totalCusto],
+        ];
+        const ws3 = XLSX.utils.aoa_to_sheet(resumoData);
+        ws3["!cols"] = [{ wch: 25 }, { wch: 18 }];
+        XLSX.utils.book_append_sheet(wb, ws3, "Resumo");
+
+        XLSX.writeFile(wb, `${(header?.nome || "orcamento").replace(/\s+/g, "_")}.xlsx`);
+    };
+
     if (ci.length === 0) {
         return (
             <div style={{ textAlign: "center", padding: 40, color: COLORS.textMuted }}>
@@ -118,21 +178,37 @@ export default function TabExportar({ ci, tc, tmf, equipes, oc, header }) {
                 <h2 style={{ fontSize: 19, fontWeight: 700, margin: 0, fontFamily: FONTS.mono }}>
                     📤 Exportar — Preço de Venda
                 </h2>
-                <button
-                    onClick={exportCSV}
-                    style={{
-                        padding: "8px 20px",
-                        borderRadius: 6,
-                        border: "none",
-                        background: `linear-gradient(135deg, ${COLORS.green}, #16A34A)`,
-                        color: "#fff",
-                        fontSize: 15,
-                        fontWeight: 700,
-                        cursor: "pointer",
-                    }}
-                >
-                    📥 Baixar Excel (CSV)
-                </button>
+                <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                        onClick={exportXLSX}
+                        style={{
+                            padding: "8px 20px",
+                            borderRadius: 6,
+                            border: "none",
+                            background: `linear-gradient(135deg, ${COLORS.green}, #16A34A)`,
+                            color: "#fff",
+                            fontSize: 15,
+                            fontWeight: 700,
+                            cursor: "pointer",
+                        }}
+                    >
+                        📥 Baixar Excel (.xlsx)
+                    </button>
+                    <button
+                        onClick={exportCSV}
+                        style={{
+                            padding: "8px 16px",
+                            borderRadius: 6,
+                            border: `1px solid ${COLORS.border}`,
+                            background: "transparent",
+                            color: COLORS.textDim,
+                            fontSize: 13,
+                            cursor: "pointer",
+                        }}
+                    >
+                        📄 Baixar CSV
+                    </button>
+                </div>
             </div>
 
             {/* Markup Mode Selector */}

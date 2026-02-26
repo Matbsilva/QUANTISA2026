@@ -232,6 +232,29 @@ export default function OrcamentoPage() {
         ]);
     }, []);
 
+    // Batch import — accepts array of items and adds them all at once
+    const batchImport = useCallback((items) => {
+        setItens((p) => [...p, ...items]);
+        setImpHist((h) => [...h, ...items.map(it => ({
+            codigo: it.n,
+            titulo: it.d,
+            mat: it.m,
+            mo: it.mo,
+            eq: it.e,
+            hhp: it.hp,
+            hha: it.ha,
+        }))]);
+        setCompText("");
+        setParsed(null);
+        setEditP(null);
+    }, []);
+
+    // Expose batch import for TabImportar
+    useEffect(() => {
+        window.__quantisaBatchImport = batchImport;
+        return () => { delete window.__quantisaBatchImport; };
+    }, [batchImport]);
+
     const uI = useCallback((id, key, val) => {
         setItens((p) => p.map((it) => (it.id === id ? { ...it, [key]: val } : it)));
     }, []);
