@@ -201,6 +201,17 @@ Toda nova feature, deploy ou bugfix crítico desenvolvido colaborativamente entr
 
 ---
 
+### [26 de Fevereiro de 2026] - Aprimoramento de UI/UX (Fontes e Sidebar)
+- **Objetivo/Motivo:** Melhorar a legibilidade geral do sistema (que estava com fontes muito pequenas) e otimizar o uso do espaço de tela (especialmente em resoluções menores ou mobile) através de um menu lateral inteligente.
+- **Alterações Arquiteturais ou UI:**
+    - **Escala de Fontes Globais:** Criação e execução de script para escalar todas as declarações de `fontSize` hardcoded nos componentes React em +30~40%. Aumento da fonte base no `globals.css`.
+    - **Sidebar Inteligente (`Sidebar.jsx`):** Refatoração da barra lateral para suportar estados *Pinned* (fixo) e *Hover* (expansível). 
+    - Adição de botão de Pin (📌) no header do menu. 
+    - Textos e badges do menu lateral agora ficam ocultos na versão minimizada (mostrando apenas os ícones) e se revelam suavemente via transição CSS ao passar o mouse.
+- **Status:** Concluído. Merge na branch `main` e deploy na Vercel.
+
+---
+
 ## 6. Próximos Passos (Roadmap Pendente)
 
 - [ ] **Importação expandida:** Múltiplas composições de uma vez (batch import de vários textos V4)
