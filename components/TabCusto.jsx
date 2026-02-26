@@ -1,7 +1,9 @@
 "use client";
+import { useState } from "react";
 import { COLORS, FONTS } from "@/lib/constants";
 import { formatCurrency, formatNumber } from "@/lib/calculos";
 import { NumericInput, TextInput } from "./Inputs";
+import ComposicaoModal from "./ComposicaoModal";
 
 const thS = { padding: "5px 6px", textAlign: "left", fontSize: 12, fontWeight: 700, color: COLORS.accent, textTransform: "uppercase", letterSpacing: "0.3px", background: "#1A1710", borderBottom: "1px solid #2A2520", whiteSpace: "nowrap" };
 const tdS = { padding: "3px 5px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14 };
@@ -42,6 +44,7 @@ function exportCostCSV(ci, header) {
 }
 
 export default function TabCusto({ header, setHeader, ci, tc, itens, setTab, addI, uI, dI }) {
+    const [viewRaw, setViewRaw] = useState(null);
     return (
         <div>
             {/* Header fields */}
@@ -109,7 +112,20 @@ export default function TabCusto({ header, setHeader, ci, tc, itens, setTab, add
                                     <tr key={it.id}>
                                         {/* # auto-numbered */}
                                         <td style={{ ...tdS, color: COLORS.textMuted, textAlign: "center", fontSize: 12 }}>{idx + 1}</td>
-                                        <td style={tdS}><TextInput value={it.d} onChange={(v) => uI(it.id, "d", v)} placeholder="Descrição..." /></td>
+                                        <td style={tdS}>
+                                            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                                                {it.composicao_raw && (
+                                                    <span
+                                                        onClick={() => setViewRaw(it)}
+                                                        title="Ver composição completa"
+                                                        style={{ cursor: "pointer", fontSize: 14, flexShrink: 0, opacity: 0.7, transition: "opacity 0.2s" }}
+                                                        onMouseEnter={(e) => e.target.style.opacity = 1}
+                                                        onMouseLeave={(e) => e.target.style.opacity = 0.7}
+                                                    >📋</span>
+                                                )}
+                                                <TextInput value={it.d} onChange={(v) => uI(it.id, "d", v)} placeholder="Descrição..." />
+                                            </div>
+                                        </td>
                                         <td style={tdS}><TextInput value={it.u} onChange={(v) => uI(it.id, "u", v)} w="34px" /></td>
                                         <td style={tdS}><NumericInput value={it.q} onChange={(v) => uI(it.id, "q", v)} /></td>
                                         <td style={tdS}><NumericInput value={it.m} onChange={(v) => uI(it.id, "m", v)} /></td>
@@ -155,6 +171,14 @@ export default function TabCusto({ header, setHeader, ci, tc, itens, setTab, add
                         </button>
                     </div>
                 </div>
+            )}
+            {/* Composição Modal */}
+            {viewRaw && (
+                <ComposicaoModal
+                    raw={viewRaw.composicao_raw}
+                    titulo={viewRaw.d}
+                    onClose={() => setViewRaw(null)}
+                />
             )}
         </div>
     );
