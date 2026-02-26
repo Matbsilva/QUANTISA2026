@@ -7,8 +7,9 @@ Este documento (`contexto.md`) é a ata definitiva e a fonte única da verdade t
 
 ## 1. Nossas Regras de Engajamento
 
-### 1.1. Diretiva Primordial: Ler e Atualizar
-Toda nova interação com um Assistente IA sênior deve começar pela leitura deste arquivo (para obtenção de contexto histórico) e **sempre** ser finalizada com a criação de uma nova entrada no "Diário de Bordo" neste próprio documento, garantindo o versionamento do pensamento.
+### 1.1. Diretiva Primordial: Ler e Atualizar OBRIGATORIAMENTE
+Toda nova interação com um Assistente IA sênior deve começar pela leitura deste arquivo (para obtenção de contexto histórico) e **SEMPRE, SEM EXCEÇÃO**, ser finalizada com a criação de uma nova entrada no "Diário de Bordo" neste próprio documento. 
+**Regra Restrita:** A IA deve atualizar o Diário de Bordo autonomamente e sem precisar pedir permissão ou aguardar o comando do Mat, garantindo o versionamento contínuo de pensamento e alterações técnicas logo após qualquer commit de código.
 
 ### 1.2. Papéis (Personas)
 *   **Mat (Product/Business Owner & Executor):** Detentor da visão do produto, define requisitos técnicos e funcionais da ferramenta de orçamentação QUANTISA, realiza curadoria humana, validação em produção e executa comandos locais de controle, push e deploy.
