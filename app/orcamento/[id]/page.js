@@ -199,6 +199,7 @@ export default function OrcamentoPage() {
             e: editP.eq,
             hp: editP.hhp,
             ha: editP.hha,
+            composicao_raw: compText, // Salva composição completa (todas as 7 seções)
         };
         setItens((p) => [...p, newItem]);
         setImpHist((p) => [...p, { ...editP }]);
@@ -206,7 +207,7 @@ export default function OrcamentoPage() {
         setEditP(null);
         setCompText("");
         setTab("custo");
-    }, [editP, itens.length]);
+    }, [editP, itens.length, compText]);
 
     const addI = useCallback(() => {
         setItens((p) => [
@@ -420,6 +421,7 @@ export default function OrcamentoPage() {
                             setOc={setOc}
                             addOC={addOC}
                             dOC={dOC}
+                            itens={itens}
                         />
                     )}
                     {tab === "simulacoes" && (
