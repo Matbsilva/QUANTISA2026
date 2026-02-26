@@ -6,7 +6,7 @@ import { NumericInput, TextInput } from "./Inputs";
 export default function TabImportar({
     compText, setCompText, parsed, editP, setEditP,
     doParse, confirmImport, impHist,
-    setParsed,
+    setParsed, setTab,
 }) {
     return (
         <div>
@@ -19,12 +19,13 @@ export default function TabImportar({
             <textarea
                 value={compText}
                 onChange={(e) => setCompText(e.target.value)}
-                placeholder={`Cole aqui o texto completo da composição...\n\nO parser identifica automaticamente:\n• Código, Título, Unidade, Grupo, Turno\n• Mat/un, MO/un, Equip/un (Seção 5)\n• HH Profissional e HH Ajudante (Seção 3/5)\n• Lista de insumos (Seção 2)`}
+                placeholder={`Cole aqui o texto completo da composição...\n\nO parser identifica automaticamente:\n• Código, Título, Unidade, Grupo, Turno\n• Mat/un, MO/un, Equip/un (Seção 5)\n• HH Profissional e HH Ajudante (Seção 3/5)\n• Lista de insumos (Seção 2)\n• Quantidade de referência da composição`}
                 style={{
                     width: "100%", height: 180, padding: 10,
                     background: COLORS.bg, border: `1px solid ${COLORS.border}`,
                     borderRadius: 6, color: COLORS.text, fontSize: 14,
                     fontFamily: FONTS.mono, outline: "none", resize: "vertical", lineHeight: 1.5,
+                    boxSizing: "border-box",
                 }}
             />
             <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
@@ -86,6 +87,30 @@ export default function TabImportar({
                         </div>
                     </div>
 
+                    {/* ═══ QUANTITY FIELD — prominent, pre-filled from reference qty ═══ */}
+                    <div style={{ marginBottom: 12, padding: 10, background: "#101A10", border: `1px solid ${COLORS.green}40`, borderRadius: 6 }}>
+                        <div style={{ fontSize: 11, color: COLORS.green, fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>
+                            📏 Quantidade do Projeto
+                        </div>
+                        <div style={{ fontSize: 12, color: COLORS.textDim, marginBottom: 8 }}>
+                            Pré-preenchida com a quantidade de referência da composição. Ajuste para a quantidade real do projeto.
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                            <div style={{ minWidth: 100 }}>
+                                <NumericInput
+                                    value={editP.q !== undefined ? editP.q : 1}
+                                    onChange={(v) => setEditP((p) => ({ ...p, q: v }))}
+                                />
+                            </div>
+                            <span style={{ fontSize: 14, color: COLORS.text }}>{editP.unidade || "un"}</span>
+                            <span style={{ fontSize: 13, color: COLORS.textDim, marginLeft: "auto" }}>
+                                Total: <b style={{ color: COLORS.accent, fontFamily: FONTS.mono }}>
+                                    {formatCurrency((editP.mat + editP.mo + editP.eq) * (editP.q || 1))}
+                                </b>
+                            </span>
+                        </div>
+                    </div>
+
                     {/* Editable values */}
                     <div style={{ fontSize: 12, color: COLORS.accent, fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Valores unitários (editáveis)</div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 6, marginBottom: 10 }}>
@@ -122,9 +147,27 @@ export default function TabImportar({
                     )}
 
                     {/* Actions */}
-                    <div style={{ display: "flex", gap: 8 }}>
-                        <button onClick={confirmImport} style={{ padding: "8px 20px", borderRadius: 5, border: "none", background: COLORS.green, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>✓ Confirmar e Adicionar</button>
-                        <button onClick={() => { setParsed(null); setEditP(null); }} style={{ padding: "8px 14px", borderRadius: 5, border: `1px solid ${COLORS.border}`, background: "transparent", color: COLORS.textDim, fontSize: 14, cursor: "pointer" }}>Cancelar</button>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                        {/* Confirm+Add → clear and stay on import tab for next */}
+                        <button
+                            onClick={() => confirmImport(false)}
+                            style={{ padding: "8px 20px", borderRadius: 5, border: "none", background: COLORS.green, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}
+                        >
+                            ✓ Confirmar e Adicionar
+                        </button>
+                        {/* Confirm+Add → navigate to custo */}
+                        <button
+                            onClick={() => confirmImport(true)}
+                            style={{ padding: "8px 16px", borderRadius: 5, border: `2px solid ${COLORS.accent}`, background: "transparent", color: COLORS.accent, fontSize: 14, fontWeight: 700, cursor: "pointer" }}
+                        >
+                            ✓ Confirmar e ir ao Custo →
+                        </button>
+                        <button
+                            onClick={() => { setParsed(null); setEditP(null); }}
+                            style={{ padding: "8px 14px", borderRadius: 5, border: `1px solid ${COLORS.border}`, background: "transparent", color: COLORS.textDim, fontSize: 14, cursor: "pointer" }}
+                        >
+                            Cancelar
+                        </button>
                     </div>
                 </div>
             )}
@@ -132,11 +175,21 @@ export default function TabImportar({
             {/* History */}
             {impHist.length > 0 && (
                 <div style={{ marginTop: 14 }}>
-                    <div style={{ fontSize: 12, color: COLORS.textMuted, fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Importadas ({impHist.length})</div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                        <div style={{ fontSize: 12, color: COLORS.textMuted, fontWeight: 700, textTransform: "uppercase" }}>
+                            Importadas nesta sessão ({impHist.length})
+                        </div>
+                        <button
+                            onClick={() => setTab("custo")}
+                            style={{ padding: "5px 14px", borderRadius: 5, border: "none", background: COLORS.accent, color: COLORS.bg, fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+                        >
+                            Avançar para Custo →
+                        </button>
+                    </div>
                     {impHist.map((h, i) => (
                         <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "5px 8px", background: COLORS.surface, borderRadius: 4, marginBottom: 3, border: `1px solid ${COLORS.border}` }}>
                             <div>
-                                <span style={{ fontSize: 13, color: COLORS.accent, fontFamily: FONTS.mono, marginRight: 6 }}>{h.codigo}</span>
+                                <span style={{ fontSize: 13, color: COLORS.accent, fontFamily: FONTS.mono, marginRight: 6 }}>#{i + 1} {h.codigo}</span>
                                 <span style={{ fontSize: 13 }}>{h.titulo && h.titulo.substring(0, 60)}</span>
                             </div>
                             <span style={{ fontSize: 13, color: COLORS.textMuted, fontFamily: FONTS.mono }}>{formatCurrency(h.mat + h.mo + h.eq)}/un</span>

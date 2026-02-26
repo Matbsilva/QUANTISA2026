@@ -189,14 +189,14 @@ export default function OrcamentoPage() {
         }
     }, [compText]);
 
-    const confirmImport = useCallback(() => {
+    const confirmImport = useCallback((goToCost = false) => {
         if (!editP) return;
         const newItem = {
             id: Date.now().toString(),
             n: editP.codigo || `C${itens.length + 1}`,
             d: editP.titulo || "Composição importada",
             u: editP.unidade || "m²",
-            q: 1,
+            q: editP.q !== undefined ? editP.q : 1,  // use quantity from import field
             m: editP.mat,
             mo: editP.mo,
             e: editP.eq,
@@ -206,11 +206,13 @@ export default function OrcamentoPage() {
         };
         setItens((p) => [...p, newItem]);
         setImpHist((p) => [...p, { ...editP }]);
+        // Clear form for the next import
         setParsed(null);
         setEditP(null);
         setCompText("");
-        setTab("custo");
-    }, [editP, itens.length, compText]);
+        // Only navigate to custo if explicitly requested
+        if (goToCost) setTab("custo");
+    }, [editP, itens.length, compText, setTab]);
 
     const addI = useCallback(() => {
         setItens((p) => [
@@ -391,6 +393,7 @@ export default function OrcamentoPage() {
                             confirmImport={confirmImport}
                             impHist={impHist}
                             setParsed={setParsed}
+                            setTab={setTab}
                         />
                     )}
                     {tab === "custo" && (
