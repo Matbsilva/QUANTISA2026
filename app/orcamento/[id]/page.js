@@ -25,6 +25,9 @@ import TabMateriais from "@/components/TabMateriais";
 import TabHistograma from "@/components/TabHistograma";
 import TabSimulacoes from "@/components/TabSimulacoes";
 import TabResumo from "@/components/TabResumo";
+import TabABC from "@/components/TabABC";
+import TabEV from "@/components/TabEV";
+import TabExportar from "@/components/TabExportar";
 
 export default function OrcamentoPage() {
     const params = useParams();
@@ -438,6 +441,22 @@ export default function OrcamentoPage() {
                             tmf={tmf}
                             equipes={equipes}
                             oc={oc}
+                        />
+                    )}
+                    {tab === "abc" && (
+                        <TabABC ci={ci} tc={tc} />
+                    )}
+                    {tab === "ev" && (
+                        <TabEV ci={ci} tc={tc} />
+                    )}
+                    {tab === "exportar" && (
+                        <TabExportar
+                            ci={ci}
+                            tc={tc}
+                            tmf={tmf}
+                            equipes={equipes}
+                            oc={oc}
+                            header={header}
                         />
                     )}
                 </div>

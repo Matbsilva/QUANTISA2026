@@ -109,44 +109,66 @@ export default function Sidebar({ tab, setTab, itensCount, tc, onBack, isSaving,
 
             {/* Nav items */}
             <div style={{ padding: "4px 0", flex: 1 }}>
-                {TABS.map((t) => (
-                    <div
-                        key={t.id}
-                        onClick={() => setTab(t.id)}
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 5,
-                            padding: "7px 8px",
-                            cursor: "pointer",
-                            color: tab === t.id ? COLORS.accent : COLORS.textDim,
-                            background:
-                                tab === t.id ? "rgba(245,158,11,0.1)" : "transparent",
-                            borderLeft:
-                                tab === t.id
-                                    ? `2px solid ${COLORS.accent}`
-                                    : "2px solid transparent",
-                            fontSize: 10,
-                            fontWeight: tab === t.id ? 600 : 400,
-                        }}
-                    >
-                        <span>{t.icon}</span>
-                        <span>{t.label}</span>
-                        {t.id === "custo" && itensCount > 0 && (
-                            <span
-                                style={{
-                                    marginLeft: "auto",
-                                    fontSize: 8,
-                                    background: COLORS.accent,
-                                    color: COLORS.bg,
-                                    borderRadius: 8,
+                {TABS.map((t, idx) => (
+                    <div key={t.id}>
+                        {t.optional && idx > 0 && !TABS[idx - 1].optional && (
+                            <div style={{
+                                borderTop: `1px solid ${COLORS.border}`,
+                                margin: "4px 8px",
+                                position: "relative",
+                            }}>
+                                <span style={{
+                                    position: "absolute",
+                                    top: -5,
+                                    left: 4,
+                                    background: COLORS.surface,
+                                    fontSize: 6,
+                                    color: COLORS.textMuted,
                                     padding: "0 4px",
-                                    fontFamily: FONTS.mono,
-                                }}
-                            >
-                                {itensCount}
-                            </span>
+                                    letterSpacing: "1px",
+                                    textTransform: "uppercase",
+                                }}>
+                                    Análise
+                                </span>
+                            </div>
                         )}
+                        <div
+                            onClick={() => setTab(t.id)}
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 5,
+                                padding: "7px 8px",
+                                cursor: "pointer",
+                                color: tab === t.id ? COLORS.accent : (t.optional ? COLORS.textMuted : COLORS.textDim),
+                                background:
+                                    tab === t.id ? "rgba(245,158,11,0.1)" : "transparent",
+                                borderLeft:
+                                    tab === t.id
+                                        ? `2px solid ${COLORS.accent}`
+                                        : "2px solid transparent",
+                                fontSize: t.optional ? 9 : 10,
+                                fontWeight: tab === t.id ? 600 : 400,
+                            }}
+                        >
+                            <span>{t.icon}</span>
+                            <span>{t.label}</span>
+                            {t.id === "custo" && itensCount > 0 && (
+                                <span
+                                    style={{
+                                        marginLeft: "auto",
+                                        fontSize: 8,
+                                        background: COLORS.accent,
+                                        color: COLORS.bg,
+                                        borderRadius: 8,
+                                        padding: "0 4px",
+                                        fontFamily: FONTS.mono,
+                                    }}
+                                >
+                                    {itensCount}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 ))}
             </div>
