@@ -213,9 +213,21 @@ Toda nova feature, deploy ou bugfix crítico desenvolvido colaborativamente entr
 
 ---
 
+### [27 de Fevereiro de 2026] - Refatoração Massiva: Zustand, Supabase Sync, NextAuth e Importação Inteligente
+- **Objetivo/Motivo:** Elevar a segurança do sistema (Rate Limiting + Senha Mestra), substituir de vez o uso de LocalStorage pela sincronização contínua com Supabase via estado global, e automatizar a carga tributária indireta preenchendo as abas de Histograma e Materiais diretamente do Importador V4 em lote.
+- **Alterações Arquiteturais ou UI:**
+    - **Refatoração Estado Global (Zustand):** Substituição de "prop-drilling" por Zustand (`lib/store.js`). Total expurgo de referências à `localStorage`. O estado em memória garante reatividade zero-delay enquanto o hook `useAutoSave` sincroniza silenciosamente com o Supabase a cada 1.5s.
+    - **Autenticação NextAuth:** Implementada proteção de rota via *Middleware* Next e Login unificado por Senha Mestra via `CredentialsProvider` (`ADMIN_PASSWORD` na `.env.local`), evitando tabelas expostas.
+    - **Rate Limiting (Segurança Financeira):** Injeção de Middleware `lib/rateLimit.js` barrando >10 requests por minuto em todos os endpoints de IA do sistema (`composicao`, `consolidacao`, `abc`, `histograma`, `ev`, `memorial`).
+    - **Parser V4 Avançado & Importação em Lote:** O `parseMultipleCompositions` foi rescrito usando a Tag `# COMPOSIÇÃO:` como âncora de corte, permitindo colar dezenas de composições de uma vez.
+    - **Injeção Lógica Materiais/Equipe:** Importações agora mapeiam dinamicamente os `insumos` para a `TabMateriais` aglomerando descrições iguais, e a carga de Mão de Obra é convertida compulsoriamente aos dias úteis (8h) injetados nativamente no `TabHistograma`.
+- **Status:** Concluído. Testes locais nativos passando (`jest`), Commit e Push validados no Github.
+
+---
+
 ## 6. Próximos Passos (Roadmap Pendente)
 
-- [ ] **Importação expandida:** Múltiplas composições de uma vez (batch import de vários textos V4)
+- [x] **Importação expandida:** Múltiplas composições de uma vez (batch import de vários textos V4)
 - [ ] **Verificação IA entre abas:** Cross-check inteligente entre Custo→Materiais, Materiais→Histograma
 - [ ] **PDF de Instruções de Obra:** Usando campo `composicao_raw` (Seção 6 do V4)
 - [ ] **Cronograma Visual:** Gantt simplificado baseado nos cenários do Histograma
