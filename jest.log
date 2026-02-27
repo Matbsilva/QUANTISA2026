@@ -1,0 +1,70 @@
+
+> quantisa-orcamento@0.1.0 test
+> jest --verbose
+
+● Validation Warning:
+
+  Unknown option "setupFilesAfterSetup" with value ["@testing-library/jest-dom"] was found.
+  This is probably a typing mistake. Fixing it will remove this message.
+
+  Configuration Documentation:
+  https://jestjs.io/docs/configuration
+
+● Validation Warning:
+
+  Unknown option "setupFilesAfterSetup" with value ["@testing-library/jest-dom"] was found.
+  This is probably a typing mistake. Fixing it will remove this message.
+
+  Configuration Documentation:
+  https://jestjs.io/docs/configuration
+
+FAIL __tests__/parser.test.js
+  parseComposition
+    √ should return null for empty or very short text (5 ms)
+    × should extract código from header (7 ms)
+    √ should extract HH values from Section 5 (4 ms)
+    √ should extract quantity from reference (2 ms)
+  parseMultipleCompositions
+    √ should return empty for null/short text (2 ms)
+    × should detect single composition (2 ms)
+    √ should split and detect multiple compositions by SEÇÃO 1 (1 ms)
+
+  ● parseComposition › should extract código from header
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "Pisos"
+    Received: "Pisos | TURNO: Diurno (8h)"
+
+    [0m [90m 34 |[39m         expect(result[33m.[39mtitulo)[33m.[39mtoContain([32m"Contrapiso"[39m)[33m;[39m
+     [90m 35 |[39m         expect(result[33m.[39munidade)[33m.[39mtoBe([32m"m²"[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 36 |[39m         expect(result[33m.[39mgrupo)[33m.[39mtoBe([32m"Pisos"[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 37 |[39m         expect(result[33m.[39mturno)[33m.[39mtoBe([32m"Diurno (8h)"[39m)[33m;[39m
+     [90m 38 |[39m         expect(result[33m.[39mmat)[33m.[39mtoBeCloseTo([35m49.20[39m[33m,[39m [35m1[39m)[33m;[39m
+     [90m 39 |[39m         expect(result[33m.[39mmo)[33m.[39mtoBeCloseTo([35m3.98[39m[33m,[39m [35m1[39m)[33m;[39m[0m
+
+      at Object.toBe (__tests__/parser.test.js:36:30)
+
+  ● parseMultipleCompositions › should detect single composition
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m  99 |[39m [32m        `[39m[33m.[39mtrim()[33m;[39m
+     [90m 100 |[39m         [36mconst[39m result [33m=[39m parseMultipleCompositions(text)[33m;[39m
+    [31m[1m>[22m[39m[90m 101 |[39m         expect(result[33m.[39mcount)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                              [31m[1m^[22m[39m
+     [90m 102 |[39m         expect(result[33m.[39mcompositions[[35m0[39m][33m.[39mcodigo)[33m.[39mtoBe([32m"COMP-001"[39m)[33m;[39m
+     [90m 103 |[39m     })[33m;[39m
+     [90m 104 |[39m[0m
+
+      at Object.toBe (__tests__/parser.test.js:101:30)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 5 passed, 7 total
+Snapshots:   0 total
+Time:        1.424 s
+Ran all test suites.

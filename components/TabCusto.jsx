@@ -4,6 +4,7 @@ import { COLORS, FONTS } from "@/lib/constants";
 import { formatCurrency, formatNumber } from "@/lib/calculos";
 import { NumericInput, TextInput } from "./Inputs";
 import ComposicaoModal from "./ComposicaoModal";
+import { useStore } from "@/lib/store";
 
 const thS = { padding: "5px 6px", textAlign: "left", fontSize: 12, fontWeight: 700, color: COLORS.accent, textTransform: "uppercase", letterSpacing: "0.3px", background: "#1A1710", borderBottom: "1px solid #2A2520", whiteSpace: "nowrap" };
 const tdS = { padding: "3px 5px", borderBottom: `1px solid ${COLORS.border}`, fontSize: 14 };
@@ -43,7 +44,8 @@ function exportCostCSV(ci, header) {
     URL.revokeObjectURL(url);
 }
 
-export default function TabCusto({ header, setHeader, ci, tc, itens, setTab, addI, uI, dI }) {
+export default function TabCusto({ ci, tc, setTab }) {
+    const { header, setHeader, itens, addI, uI, dI } = useStore();
     const [viewRaw, setViewRaw] = useState(null);
     return (
         <div>

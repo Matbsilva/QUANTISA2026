@@ -2,8 +2,13 @@
 import { useState } from "react";
 import { COLORS, FONTS, TABS } from "@/lib/constants";
 import { formatNumber } from "@/lib/calculos";
+import { useStore } from "@/lib/store";
 
-export default function Sidebar({ tab, setTab, itensCount, tc, onBack, isSaving, orcamentoNome }) {
+export default function Sidebar({ tab, setTab, onBack, isSaving }) {
+    const { header, itens, tc } = useStore();
+    const itensCount = itens.length;
+    const orcamentoNome = header.nome;
+
     const [isPinned, setIsPinned] = useState(true);
     const [isHovered, setIsHovered] = useState(false);
 

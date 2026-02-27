@@ -1,8 +1,9 @@
 "use client";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { COLORS, FONTS, GOOGLE_FONTS_URL, DEFAULT_HEADER, DEFAULT_MAT_FIX, DEFAULT_EQUIPES, DEFAULT_OUTROS_CUSTOS, DEFAULT_RESUMO_FIX } from "@/lib/constants";
+import { COLORS, FONTS, GOOGLE_FONTS_URL, DEFAULT_HEADER } from "@/lib/constants";
 import { parseComposition } from "@/lib/parser";
+import { useStore } from "@/lib/store";
 import { useAutoSave } from "@/lib/useAutoSave";
 import {
     carregarOrcamento,
@@ -25,6 +26,8 @@ import TabMateriais from "@/components/TabMateriais";
 import TabHistograma from "@/components/TabHistograma";
 import TabSimulacoes from "@/components/TabSimulacoes";
 import TabResumo from "@/components/TabResumo";
+import TabConsolidacao from "@/components/TabConsolidacao";
+import TabMemorial from "@/components/TabMemorial";
 import TabABC from "@/components/TabABC";
 import TabEV from "@/components/TabEV";
 import TabExportar from "@/components/TabExportar";
@@ -41,18 +44,20 @@ export default function OrcamentoPage() {
 
     // --- State ---
     const [tab, setTab] = useState("custo");
-    const [header, setHeader] = useState({ ...DEFAULT_HEADER });
-    const [itens, setItens] = useState([]);
     const [compText, setCompText] = useState("");
     const [parsed, setParsed] = useState(null);
     const [editP, setEditP] = useState(null);
     const [impHist, setImpHist] = useState([]);
-    const [matFix, setMatFix] = useState([...DEFAULT_MAT_FIX]);
-    const [equipes, setEquipes] = useState(
-        DEFAULT_EQUIPES.map((g) => ({ ...g, l: g.l.map((f) => ({ ...f })) }))
-    );
-    const [oc, setOc] = useState([...DEFAULT_OUTROS_CUSTOS]);
-    const [resumoFix, setResumoFix] = useState([...DEFAULT_RESUMO_FIX]);
+
+    // --- Global Store ---
+    const {
+        header, setHeader,
+        itens, setItens,
+        matFix, setMatFix,
+        equipes, setEquipes,
+        oc, setOc,
+        resumoFix, setResumoFix
+    } = useStore();
 
     // --- Load Data from Supabase ---
     useEffect(() => {
@@ -175,112 +180,6 @@ export default function OrcamentoPage() {
 
     // --- Total Materials Fix ---
     const tmf = useMemo(() => matFix.reduce((s, m) => s + m.q * m.p, 0), [matFix]);
-
-    // --- Actions ---
-    const doParse = useCallback(() => {
-        const result = parseComposition(compText);
-        if (result && result.parsed) {
-            setParsed(result);
-            setEditP({ ...result });
-        } else {
-            setParsed(null);
-            setEditP(null);
-            alert("Não foi possível extrair dados. Verifique se o texto está no formato V4 completo.");
-        }
-    }, [compText]);
-
-    const confirmImport = useCallback((goToCost = false) => {
-        if (!editP) return;
-        const newItem = {
-            id: Date.now().toString(),
-            n: editP.codigo || `C${itens.length + 1}`,
-            d: editP.titulo || "Composição importada",
-            u: editP.unidade || "m²",
-            q: editP.q !== undefined ? editP.q : 1,  // use quantity from import field
-            m: editP.mat,
-            mo: editP.mo,
-            e: editP.eq,
-            hp: editP.hhp,
-            ha: editP.hha,
-            composicao_raw: compText, // Salva composição completa (todas as 7 seções)
-        };
-        setItens((p) => [...p, newItem]);
-        setImpHist((p) => [...p, { ...editP }]);
-        // Clear form for the next import
-        setParsed(null);
-        setEditP(null);
-        setCompText("");
-        // Only navigate to custo if explicitly requested
-        if (goToCost) setTab("custo");
-    }, [editP, itens.length, compText, setTab]);
-
-    const addI = useCallback(() => {
-        setItens((p) => [
-            ...p,
-            {
-                id: Date.now().toString(),
-                n: "",
-                d: "",
-                u: "m²",
-                q: 0,
-                m: 0,
-                mo: 0,
-                e: 0,
-                hp: 0,
-                ha: 0,
-            },
-        ]);
-    }, []);
-
-    // Batch import — accepts array of items and adds them all at once
-    const batchImport = useCallback((items) => {
-        setItens((p) => [...p, ...items]);
-        setImpHist((h) => [...h, ...items.map(it => ({
-            codigo: it.n,
-            titulo: it.d,
-            mat: it.m,
-            mo: it.mo,
-            eq: it.e,
-            hhp: it.hp,
-            hha: it.ha,
-        }))]);
-        setCompText("");
-        setParsed(null);
-        setEditP(null);
-    }, []);
-
-    // Expose batch import for TabImportar
-    useEffect(() => {
-        window.__quantisaBatchImport = batchImport;
-        return () => { delete window.__quantisaBatchImport; };
-    }, [batchImport]);
-
-    const uI = useCallback((id, key, val) => {
-        setItens((p) => p.map((it) => (it.id === id ? { ...it, [key]: val } : it)));
-    }, []);
-
-    const dI = useCallback((id) => {
-        setItens((p) => p.filter((it) => it.id !== id));
-    }, []);
-
-    const addMF = useCallback(() => {
-        setMatFix((p) => [
-            ...p,
-            { id: "f" + Date.now(), n: "", i: "", u: "un", q: 1, p: 0 },
-        ]);
-    }, []);
-
-    const dMF = useCallback((id) => {
-        setMatFix((p) => p.filter((x) => x.id !== id));
-    }, []);
-
-    const addOC = useCallback(() => {
-        setOc((p) => [...p, { id: "o" + Date.now(), d: "", u: "un", q: 0, v: 0 }]);
-    }, []);
-
-    const dOC = useCallback((id) => {
-        setOc((p) => p.filter((x) => x.id !== id));
-    }, []);
 
     // --- Loading / Error States ---
     if (loading) {
@@ -407,50 +306,25 @@ export default function OrcamentoPage() {
                 >
                     {tab === "importar" && (
                         <TabImportar
-                            compText={compText}
-                            setCompText={setCompText}
-                            parsed={parsed}
-                            editP={editP}
-                            setEditP={setEditP}
-                            doParse={doParse}
-                            confirmImport={confirmImport}
-                            impHist={impHist}
-                            setParsed={setParsed}
                             setTab={setTab}
                         />
                     )}
                     {tab === "custo" && (
                         <TabCusto
-                            header={header}
-                            setHeader={setHeader}
                             ci={ci}
                             tc={tc}
-                            itens={itens}
                             setTab={setTab}
-                            addI={addI}
-                            uI={uI}
-                            dI={dI}
                         />
                     )}
                     {tab === "materiais" && (
                         <TabMateriais
-                            matFix={matFix}
-                            setMatFix={setMatFix}
                             tmf={tmf}
-                            addMF={addMF}
-                            dMF={dMF}
                         />
                     )}
                     {tab === "histograma" && (
                         <TabHistograma
-                            equipes={equipes}
-                            setEquipes={setEquipes}
                             tc={tc}
                             oc={oc}
-                            setOc={setOc}
-                            addOC={addOC}
-                            dOC={dOC}
-                            itens={itens}
                         />
                     )}
                     {tab === "simulacoes" && (
@@ -459,13 +333,24 @@ export default function OrcamentoPage() {
                             totalMODireto={tc.mo}
                         />
                     )}
-                    {tab === "resumo" && (
-                        <TabResumo
-                            resumoFix={resumoFix}
-                            setResumoFix={setResumoFix}
+                    {tab === "consolidacao" && (
+                        <TabConsolidacao
                             tc={tc}
                             tmf={tmf}
-                            equipes={equipes}
+                            oc={oc}
+                        />
+                    )}
+                    {tab === "resumo" && (
+                        <TabResumo
+                            tc={tc}
+                            tmf={tmf}
+                            oc={oc}
+                        />
+                    )}
+                    {tab === "memorial" && (
+                        <TabMemorial
+                            tc={tc}
+                            tmf={tmf}
                             oc={oc}
                         />
                     )}
@@ -480,9 +365,7 @@ export default function OrcamentoPage() {
                             ci={ci}
                             tc={tc}
                             tmf={tmf}
-                            equipes={equipes}
                             oc={oc}
-                            header={header}
                         />
                     )}
                 </div>

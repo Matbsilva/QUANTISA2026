@@ -3,8 +3,11 @@ import { useState } from "react";
 import { COLORS, FONTS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/calculos";
 import { NumericInput, TextInput } from "./Inputs";
+import { exportCSV, exportXLSX } from "@/lib/exportUtils";
+import { useStore } from "@/lib/store";
 
-export default function TabHistograma({ equipes, setEquipes, tc, oc, setOc, addOC, dOC, itens }) {
+export default function TabHistograma({ tc }) {
+    const { equipes, setEquipes, oc, setOc, addOC, dOC, itens, header } = useStore();
     const [aiLoading, setAiLoading] = useState(false);
     const [aiError, setAiError] = useState(null);
     const [aiCenarios, setAiCenarios] = useState(null);
@@ -137,7 +140,7 @@ export default function TabHistograma({ equipes, setEquipes, tc, oc, setOc, addO
         <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                 <h2 style={{ fontSize: 19, fontWeight: 700, margin: 0, fontFamily: FONTS.mono }}>Histograma de Equipe</h2>
-                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                     <div style={{ textAlign: "center" }}>
                         <div style={{ fontSize: 18, fontWeight: 700, color: COLORS.blue, fontFamily: FONTS.mono }}>{formatCurrency(moTotal)}</div>
                         <div style={{ fontSize: 9, color: COLORS.textMuted }}>M.O. EQUIPES</div>
@@ -146,6 +149,28 @@ export default function TabHistograma({ equipes, setEquipes, tc, oc, setOc, addO
                         <div style={{ fontSize: 18, fontWeight: 700, color: COLORS.purple, fontFamily: FONTS.mono }}>{formatCurrency(tOc)}</div>
                         <div style={{ fontSize: 9, color: COLORS.textMuted }}>OUTROS CUSTOS</div>
                     </div>
+                    <button onClick={() => {
+                        const eqRows = [];
+                        equipes.forEach(g => {
+                            eqRows.push([g.g, "", "", "", ""]);
+                            g.l.forEach(f => eqRows.push(["", f.f, f.d, f.p, f.di, f.d * f.p * f.di]));
+                        });
+                        const ocRows = oc.map(o => [o.d, o.u, o.q, o.v, o.q * o.v]);
+                        exportXLSX([
+                            { name: "Equipes", data: [["HISTOGRAMA DE EQUIPE"], [], ["Grupo", "Função", "Diária R$", "Pessoas", "Dias", "Total"], ...eqRows, [], ["", "", "", "", "TOTAL M.O.", moTotal]], cols: [{ wch: 20 }, { wch: 18 }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 14 }] },
+                            { name: "Outros Custos", data: [["OUTROS CUSTOS DE M.O."], [], ["Descrição", "Un", "Qtd", "Valor Un", "Total"], ...ocRows, [], ["", "", "", "TOTAL", tOc]], cols: [{ wch: 30 }, { wch: 6 }, { wch: 8 }, { wch: 12 }, { wch: 14 }] },
+                        ], `${(header?.nome || "orcamento").replace(/\s+/g, "_")}_histograma`);
+                    }} style={{ padding: "4px 10px", borderRadius: 4, border: `1px solid ${COLORS.green}`, background: "transparent", color: COLORS.green, fontSize: 11, cursor: "pointer" }}>⬇ xlsx</button>
+                    <button onClick={() => {
+                        const rows = [["Grupo", "Função", "Diária R$", "Pessoas", "Dias", "Total"]];
+                        equipes.forEach(g => { g.l.forEach(f => rows.push([g.g, f.f, f.d.toFixed(2), f.p, f.di, (f.d * f.p * f.di).toFixed(2)])); });
+                        rows.push(["", "", "", "", "TOTAL M.O.", moTotal.toFixed(2)]);
+                        rows.push([]);
+                        rows.push(["OUTROS CUSTOS"]);
+                        oc.forEach(o => rows.push([o.d, o.u, o.q, o.v.toFixed(2), (o.q * o.v).toFixed(2)]));
+                        rows.push(["", "", "", "TOTAL", tOc.toFixed(2)]);
+                        exportCSV(rows, `${(header?.nome || "orcamento").replace(/\s+/g, "_")}_histograma`);
+                    }} style={{ padding: "4px 10px", borderRadius: 4, border: `1px solid ${COLORS.border}`, background: "transparent", color: COLORS.textMuted, fontSize: 11, cursor: "pointer" }}>⬇ csv</button>
                 </div>
             </div>
 

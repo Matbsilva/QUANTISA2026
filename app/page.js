@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { COLORS, FONTS, GOOGLE_FONTS_URL } from "@/lib/constants";
 import { listarOrcamentos, criarOrcamento, excluirOrcamento } from "@/lib/supabaseOrcamento";
 
@@ -88,41 +89,61 @@ export default function Dashboard() {
             marginBottom: 40,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 8 }}>
-            <div
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 12,
-                background: `linear-gradient(135deg, ${COLORS.accent}, ${COLORS.accent2})`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 28,
-                fontWeight: 800,
-                color: COLORS.bg,
-                fontFamily: FONTS.mono,
-              }}
-            >
-              Q
-            </div>
-            <div>
-              <h1
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <div
                 style={{
-                  fontSize: 36,
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  background: `linear-gradient(135deg, ${COLORS.accent}, ${COLORS.accent2})`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 28,
                   fontWeight: 800,
-                  margin: 0,
-                  background: `linear-gradient(90deg, ${COLORS.accent}, ${COLORS.accent2})`,
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
+                  color: COLORS.bg,
+                  fontFamily: FONTS.mono,
                 }}
               >
-                QUANTISA
-              </h1>
-              <p style={{ margin: 0, fontSize: 17, color: COLORS.textDim, fontFamily: FONTS.mono }}>
-                Sistema de Orçamentação
-              </p>
+                Q
+              </div>
+              <div>
+                <h1
+                  style={{
+                    fontSize: 36,
+                    fontWeight: 800,
+                    margin: 0,
+                    background: `linear-gradient(90deg, ${COLORS.accent}, ${COLORS.accent2})`,
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  QUANTISA
+                </h1>
+                <p style={{ margin: 0, fontSize: 17, color: COLORS.textDim, fontFamily: FONTS.mono }}>
+                  Sistema de Orçamentação
+                </p>
+              </div>
             </div>
+            <button
+              onClick={() => signOut()}
+              style={{
+                padding: "8px 16px",
+                background: "transparent",
+                border: `1px solid ${COLORS.border}`,
+                borderRadius: 8,
+                color: COLORS.textDim,
+                cursor: "pointer",
+                fontWeight: 600,
+                transition: "all 0.2s",
+                fontFamily: FONTS.sans,
+              }}
+              onMouseEnter={(e) => { e.target.style.color = COLORS.red; e.target.style.borderColor = COLORS.red; }}
+              onMouseLeave={(e) => { e.target.style.color = COLORS.textDim; e.target.style.borderColor = COLORS.border; }}
+            >
+              Sair
+            </button>
           </div>
         </div>
 

@@ -3,11 +3,13 @@ import { useState, useMemo } from "react";
 import { COLORS, FONTS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/calculos";
 import * as XLSX from "xlsx";
+import { useStore } from "@/lib/store";
 
 /**
  * Aba Exportar — Gera planilha de preço de venda em Excel (CSV)
  */
-export default function TabExportar({ ci, tc, tmf, equipes, oc, header }) {
+export default function TabExportar({ ci, tc, tmf }) {
+    const { equipes, oc, header } = useStore();
     const [markupMode, setMarkupMode] = useState("proporcional"); // proporcional | uniforme | abc
     const [markupUniforme, setMarkupUniforme] = useState(25);
 

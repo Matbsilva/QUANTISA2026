@@ -1,18 +1,26 @@
 import { gerarTextoIA } from "@/lib/geminiService";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function POST(request) {
-    try {
-        const body = await request.json();
-        const { itens } = body;
+  try {
+    const limitRes = checkRateLimit("global_ai", 10, 60000);
+    if (!limitRes.success) {
+      return Response.json(
+        { error: `Limite de requisições excedido. Aguarde ${Math.ceil((limitRes.resetTime - Date.now()) / 1000)}s e tente novamente.` },
+        { status: 429 }
+      );
+    }
+    const body = await request.json();
+    const { itens } = body;
 
-        if (!itens || itens.length === 0) {
-            return Response.json(
-                { error: "Nenhum item para analisar" },
-                { status: 400 }
-            );
-        }
+    if (!itens || itens.length === 0) {
+      return Response.json(
+        { error: "Nenhum item para analisar" },
+        { status: 400 }
+      );
+    }
 
-        const systemPrompt = `Você é Marcus, engenheiro civil sênior com 15+ anos de experiência em orçamentação.
+    const systemPrompt = `Você é Marcus, engenheiro civil sênior com 15+ anos de experiência em orçamentação.
 Analise cada item fornecido e sugira 3 alternativas técnicas:
 1. PADRÃO (recomendado) – melhor custo-benefício
 2. ECONÔMICO – reduz custo mas com trade-offs claros
@@ -42,25 +50,25 @@ Responda APENAS com JSON válido, sem markdown, sem backticks:
   ]
 }`;
 
-        const userPrompt = `Itens Classe A para análise de Engenharia de Valor:
+    const userPrompt = `Itens Classe A para análise de Engenharia de Valor:
 ${itens.map((it) => `- Item ${it.n}: ${it.d} (${it.q} ${it.u}) — Custo: R$ ${it.tot.toFixed(2)} (Mat: R$ ${it.m.toFixed(2)}/un, MO: R$ ${it.mo.toFixed(2)}/un, Eq: R$ ${it.e.toFixed(2)}/un)`).join("\n")}
 
 Gere alternativas para cada item.`;
 
-        const text = await gerarTextoIA(systemPrompt, userPrompt);
-        const cleaned = text.trim();
+    const text = await gerarTextoIA(systemPrompt, userPrompt);
+    const cleaned = text.trim();
 
-        let jsonStr = cleaned;
-        const jsonMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)```/);
-        if (jsonMatch) jsonStr = jsonMatch[1].trim();
+    let jsonStr = cleaned;
+    const jsonMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) jsonStr = jsonMatch[1].trim();
 
-        const parsed = JSON.parse(jsonStr);
-        return Response.json(parsed);
-    } catch (err) {
-        console.error("Erro na API EV:", err);
-        return Response.json(
-            { error: err.message || "Erro ao gerar análise" },
-            { status: 500 }
-        );
-    }
+    const parsed = JSON.parse(jsonStr);
+    return Response.json(parsed);
+  } catch (err) {
+    console.error("Erro na API EV:", err);
+    return Response.json(
+      { error: err.message || "Erro ao gerar análise" },
+      { status: 500 }
+    );
+  }
 }

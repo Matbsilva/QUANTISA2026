@@ -3,17 +3,62 @@ import { useState } from "react";
 import { COLORS, FONTS } from "@/lib/constants";
 import { formatCurrency, formatNumber } from "@/lib/calculos";
 import { NumericInput, TextInput } from "./Inputs";
-import { parseMultipleCompositions } from "@/lib/parser";
+import { parseComposition, parseMultipleCompositions } from "@/lib/parser";
+import { useStore } from "@/lib/store";
 
-export default function TabImportar({
-    compText, setCompText, parsed, editP, setEditP,
-    doParse, confirmImport, impHist,
-    setParsed, setTab,
-}) {
+export default function TabImportar({ setTab }) {
+    const { itens, setItens, batchImport } = useStore();
+
+    // Extracted Local State (from page.js)
+    const [compText, setCompText] = useState("");
+    const [parsed, setParsed] = useState(null);
+    const [editP, setEditP] = useState(null);
+    const [impHist, setImpHist] = useState([]);
+
     // Batch import state
     const [batchMode, setBatchMode] = useState(false);
     const [batchResults, setBatchResults] = useState(null);
     const [batchImported, setBatchImported] = useState([]);
+
+    const doParse = () => {
+        const result = parseComposition(compText);
+        if (result && result.parsed) {
+            setParsed(result);
+            setEditP({ ...result });
+        } else {
+            setParsed(null);
+            setEditP(null);
+            alert("Não foi possível extrair dados. Verifique se o texto está no formato V4 completo.");
+        }
+    };
+
+    const confirmImport = (goToCost = false) => {
+        if (!editP) return;
+        const newItem = {
+            id: Date.now().toString(),
+            n: editP.codigo || `C${itens.length + 1}`,
+            d: editP.titulo || "Composição importada",
+            u: editP.unidade || "m²",
+            q: editP.q !== undefined ? editP.q : 1,
+            m: editP.mat,
+            mo: editP.mo,
+            e: editP.eq,
+            hp: editP.hhp,
+            ha: editP.hha,
+            composicao_raw: compText,
+        };
+        setItens((p) => [...p, newItem]);
+        setImpHist((p) => [...p, { ...editP }]);
+        setParsed(null);
+        setEditP(null);
+        setCompText("");
+        if (goToCost) setTab("custo");
+    };
+
+    // AI Generation state
+    const [aiPrompt, setAiPrompt] = useState("");
+    const [generatingAI, setGeneratingAI] = useState(false);
+    const [aiError, setAiError] = useState(null);
 
     const handleBatchParse = () => {
         const result = parseMultipleCompositions(compText);
@@ -45,9 +90,46 @@ export default function TabImportar({
                 imported.push(item);
             }
         });
-        if (imported.length > 0 && onImport) {
-            onImport(imported);
+        if (imported.length > 0) {
+            setItens((p) => [...p, ...imported]);
             setBatchImported(imported);
+            setImpHist((h) => [...h, ...imported.map(it => ({
+                codigo: it.n, titulo: it.d, mat: it.m, mo: it.mo, eq: it.e, hhp: it.hp, ha: it.ha
+            }))]);
+        }
+    };
+
+    const handleGenerateAI = async () => {
+        if (!aiPrompt.trim()) return;
+        try {
+            setGeneratingAI(true);
+            setAiError(null);
+            const res = await fetch("/api/ia/composicao", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ descricao: aiPrompt })
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || "Falha ao gerar composição.");
+            }
+
+            const data = await res.json();
+            setCompText(data.markdown);
+
+            // Auto parse the generated text
+            const parsedRes = parseMultipleCompositions(data.markdown);
+            if (parsedRes.count > 0) {
+                setBatchMode(true);
+                setBatchResults(parsedRes);
+            } else {
+                if (doParse) doParse();
+            }
+        } catch (error) {
+            setAiError(error.message);
+        } finally {
+            setGeneratingAI(false);
         }
     };
 
@@ -70,6 +152,46 @@ export default function TabImportar({
                 >
                     {batchMode ? "◉ Modo Lote" : "○ Modo Lote"}
                 </button>
+            </div>
+
+            {/* AI GENERATOR SECTION */}
+            <div style={{
+                marginBottom: 20, background: "rgba(59, 130, 246, 0.05)",
+                border: `1px solid ${COLORS.blue}40`, borderRadius: 8, padding: 15
+            }}>
+                <h3 style={{ fontSize: 15, fontWeight: 700, color: COLORS.blue, margin: "0 0 10px", fontFamily: FONTS.mono }}>
+                    🤖 Gerador IA de Preços e Composições
+                </h3>
+                <p style={{ fontSize: 13, color: COLORS.textDim, margin: "0 0 10px", lineHeight: 1.4 }}>
+                    Descreva o serviço que precisa orçar (ex: "Alvenaria de bloco estrutural 14x19x39") e a IA criará a composição completa usando a biblioteca de insumos validada.
+                </p>
+                <div style={{ display: "flex", gap: 10 }}>
+                    <input
+                        type="text"
+                        value={aiPrompt}
+                        onChange={(e) => setAiPrompt(e.target.value)}
+                        placeholder="Descreva o serviço ou cole um descritivo..."
+                        style={{
+                            flex: 1, padding: "10px 12px", borderRadius: 4,
+                            border: `1px solid ${COLORS.border}`, background: COLORS.bg,
+                            color: COLORS.text, fontSize: 14, outline: "none"
+                        }}
+                        onKeyDown={(e) => { if (e.key === "Enter") handleGenerateAI(); }}
+                    />
+                    <button
+                        onClick={handleGenerateAI}
+                        disabled={generatingAI || !aiPrompt.trim()}
+                        style={{
+                            padding: "0 20px", borderRadius: 4, border: "none",
+                            background: generatingAI ? COLORS.border : COLORS.blue,
+                            color: "#fff", fontSize: 14, fontWeight: 700,
+                            cursor: generatingAI || !aiPrompt.trim() ? "not-allowed" : "pointer"
+                        }}
+                    >
+                        {generatingAI ? "⏳ Gerando..." : "Gerar"}
+                    </button>
+                </div>
+                {aiError && <div style={{ color: COLORS.red, fontSize: 12, marginTop: 8 }}>⚠️ {aiError}</div>}
             </div>
 
             <p style={{ fontSize: 14, color: COLORS.textDim, margin: "0 0 10px" }}>
@@ -225,8 +347,9 @@ export default function TabImportar({
                             <button
                                 onClick={() => handleBatchImportAll((items) => {
                                     // Use confirmImport per item — we need parent to handle batch
-                                    if (window.__quantisaBatchImport) {
-                                        window.__quantisaBatchImport(items);
+                                    if (batchImport) {
+                                        batchImport(items);
+                                        setBatchImported(items);
                                     }
                                 })}
                                 disabled={batchResults.compositions.filter(c => c.parsed).length === 0}

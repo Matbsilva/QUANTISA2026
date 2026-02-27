@@ -2,8 +2,11 @@
 import { COLORS, FONTS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/calculos";
 import { NumericInput, TextInput } from "./Inputs";
+import { exportCSV, exportXLSX } from "@/lib/exportUtils";
+import { useStore } from "@/lib/store";
 
-export default function TabResumo({ resumoFix, setResumoFix, tc, tmf, equipes, oc }) {
+export default function TabResumo({ tc, tmf }) {
+    const { resumoFix, setResumoFix, equipes, oc, header } = useStore();
     const moTotal = equipes.reduce((s, g) => s + g.l.reduce((s2, f) => s2 + f.d * f.p * f.di, 0), 0);
     const tOc = oc.reduce((s, o) => s + o.q * o.v, 0);
     const rFix = resumoFix.reduce((s, o) => s + o.q * o.v, 0);
@@ -30,8 +33,28 @@ export default function TabResumo({ resumoFix, setResumoFix, tc, tmf, equipes, o
         <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                 <h2 style={{ fontSize: 19, fontWeight: 700, margin: 0, fontFamily: FONTS.mono }}>Resumo</h2>
-                <div style={{ fontSize: 22, fontWeight: 800, color: COLORS.accent, fontFamily: FONTS.mono }}>
-                    {formatCurrency(gTotal)}
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: COLORS.accent, fontFamily: FONTS.mono }}>
+                        {formatCurrency(gTotal)}
+                    </div>
+                    <button onClick={() => {
+                        const fixRows = resumoFix.map(r => [r.n, r.d, r.u, r.q, r.v, r.q * r.v]);
+                        const propRows = itensRes.map(it => [it.n || "", it.d, it.tot, it.propFix, it.propMOH, it.propMat, it.tot + it.propFix + it.propMOH + it.propMat]);
+                        exportXLSX([
+                            { name: "Itens Fixos", data: [["ITENS FIXOS RESUMO"], [], ["#", "Descrição", "Un", "Qtd", "Valor", "Total"], ...fixRows, [], ["", "", "", "", "TOTAL", rFix]], cols: [{ wch: 8 }, { wch: 35 }, { wch: 6 }, { wch: 8 }, { wch: 12 }, { wch: 14 }] },
+                            { name: "Distribuição", data: [["DISTRIBUIÇÃO PROPORCIONAL"], [], ["Item", "Descrição", "Custo Dir.", "Fix Prop.", "M.O. Prop.", "Mat Prop.", "TOTAL"], ...propRows, [], ["", "TOTAL", tc.t, rFix, moTotal + tOc, tmf, gTotal]], cols: [{ wch: 8 }, { wch: 35 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 16 }] },
+                            { name: "Consolidado", data: [["RESUMO CONSOLIDADO"], [], ["Descrição", "Valor R$"], ["Composições (Custo Direto)", tc.t], ["Materiais Fixos", tmf], ["M.O. Equipes", moTotal + tOc], ["Itens Resumo", rFix], [], ["TOTAL GERAL", gTotal]], cols: [{ wch: 30 }, { wch: 18 }] },
+                        ], `${(header?.nome || "orcamento").replace(/\s+/g, "_")}_resumo`);
+                    }} style={{ padding: "4px 10px", borderRadius: 4, border: `1px solid ${COLORS.green}`, background: "transparent", color: COLORS.green, fontSize: 11, cursor: "pointer" }}>⬇ xlsx</button>
+                    <button onClick={() => {
+                        const rows = [["RESUMO FINANCEIRO"], [], ["Descrição", "Valor R$"]];
+                        rows.push(["Composições", tc.t.toFixed(2)]);
+                        rows.push(["Materiais Fixos", tmf.toFixed(2)]);
+                        rows.push(["M.O. Equipes", (moTotal + tOc).toFixed(2)]);
+                        rows.push(["Itens Resumo", rFix.toFixed(2)]);
+                        rows.push(["TOTAL GERAL", gTotal.toFixed(2)]);
+                        exportCSV(rows, `${(header?.nome || "orcamento").replace(/\s+/g, "_")}_resumo`);
+                    }} style={{ padding: "4px 10px", borderRadius: 4, border: `1px solid ${COLORS.border}`, background: "transparent", color: COLORS.textMuted, fontSize: 11, cursor: "pointer" }}>⬇ csv</button>
                 </div>
             </div>
 

@@ -1,7 +1,8 @@
 "use client";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { COLORS, FONTS } from "@/lib/constants";
 import { formatCurrency, formatNumber } from "@/lib/calculos";
+import ReactMarkdown from "react-markdown";
 
 /**
  * Aba ABC — Análise Pareto 80/20 automática
@@ -42,6 +43,40 @@ export default function TabABC({ ci, tc }) {
     const classeColors = { A: COLORS.red, B: COLORS.accent, C: COLORS.green };
     const classeBg = { A: "#EF444415", B: "#F59E0B15", C: "#22C55E15" };
 
+    const [loadingAI, setLoadingAI] = useState(false);
+    const [aiResult, setAiResult] = useState(null);
+    const [aiError, setAiError] = useState(null);
+
+    const handleGenerate = async () => {
+        try {
+            setLoadingAI(true);
+            setAiError(null);
+
+            const res = await fetch("/api/ia/abc-riscos", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    header: { nome: "Orçamento" },
+                    tc,
+                    equipes: [], // Passed for Cronograma sizing base (could be dynamic later)
+                    itens: ranked
+                })
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || "Erro na API de ABC/Riscos");
+            }
+
+            const data = await res.json();
+            setAiResult(data);
+        } catch (error) {
+            setAiError(error.message);
+        } finally {
+            setLoadingAI(false);
+        }
+    };
+
     if (ranked.length === 0) {
         return (
             <div style={{ textAlign: "center", padding: 40, color: COLORS.textMuted }}>
@@ -56,9 +91,56 @@ export default function TabABC({ ci, tc }) {
 
     return (
         <div>
-            <h2 style={{ fontSize: 19, fontWeight: 700, margin: "0 0 12px", fontFamily: FONTS.mono }}>
-                🎯 Análise ABC — Pareto 80/20
-            </h2>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <h2 style={{ fontSize: 19, fontWeight: 700, margin: 0, fontFamily: FONTS.mono }}>
+                    🎯 Análise ABC — Pareto 80/20
+                </h2>
+                <button
+                    onClick={handleGenerate}
+                    disabled={loadingAI}
+                    style={{
+                        padding: "8px 16px", borderRadius: 6, border: "none",
+                        background: loadingAI ? COLORS.border : COLORS.accent,
+                        color: COLORS.bg, fontSize: 13, fontWeight: 700,
+                        cursor: loadingAI ? "wait" : "pointer", transition: "all 0.2s"
+                    }}
+                >
+                    {loadingAI ? "⏳ Gerando Análise..." : "🤖 Gerar Análise IA, Riscos e EV (Prompt 4)"}
+                </button>
+            </div>
+
+            {aiError && (
+                <div style={{ marginBottom: 15, padding: 15, background: COLORS.red + "15", border: `1px solid ${COLORS.red}40`, borderRadius: 6, color: COLORS.red }}>
+                    ⚠️ Erro: {aiError}
+                </div>
+            )}
+
+            {/* AI RESULTS */}
+            {aiResult && (
+                <div style={{ marginBottom: 30, display: "flex", flexDirection: "column", gap: 15 }}>
+                    <div style={{ padding: 20, background: COLORS.surface, border: `1px solid ${COLORS.red}`, borderRadius: 8 }}>
+                        <h3 style={{ color: COLORS.red, margin: "0 0 10px" }}>🚨 Engenharia de Valor (Itens Classe A)</h3>
+                        <div style={{ fontSize: 13 }}><ReactMarkdown>{aiResult.engenharia_valor || ""}</ReactMarkdown></div>
+                    </div>
+
+                    <div style={{ display: "flex", gap: 15 }}>
+                        <div style={{ flex: 1, padding: 20, background: COLORS.surface, border: `1px solid ${COLORS.blue}`, borderRadius: 8 }}>
+                            <h3 style={{ color: COLORS.blue, margin: "0 0 10px" }}>📅 Sugestão de Cronograma</h3>
+                            <div style={{ fontSize: 13 }}><ReactMarkdown>{aiResult.cronograma || ""}</ReactMarkdown></div>
+                        </div>
+
+                        <div style={{ flex: 1, padding: 20, background: COLORS.surface, border: `1px solid ${COLORS.green}`, borderRadius: 8 }}>
+                            <h3 style={{ color: COLORS.green, margin: "0 0 10px" }}>👥 Análise de Equipe (Cenários)</h3>
+                            <div style={{ fontSize: 13 }}><ReactMarkdown>{aiResult.analise_equipes || ""}</ReactMarkdown></div>
+                        </div>
+                    </div>
+
+                    <div style={{ padding: 20, background: COLORS.surface, border: `2px dashed ${COLORS.accent2}`, borderRadius: 8 }}>
+                        <h3 style={{ color: COLORS.accent2, margin: "0 0 10px" }}>⚠️ Checklist de Riscos</h3>
+                        <div style={{ fontSize: 14 }}><ReactMarkdown>{aiResult.riscos_checklist || ""}</ReactMarkdown></div>
+                    </div>
+                </div>
+            )}
 
             {/* Summary Cards */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 14 }}>
