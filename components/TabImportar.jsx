@@ -7,7 +7,7 @@ import { parseComposition, parseMultipleCompositions } from "@/lib/parser";
 import { useStore } from "@/lib/store";
 
 export default function TabImportar({ setTab }) {
-    const { itens, setItens, batchImport } = useStore();
+    const { itens, setItens, matFix, setMatFix, equipes, setEquipes } = useStore();
 
     // Extracted Local State (from page.js)
     const [compText, setCompText] = useState("");
@@ -34,12 +34,13 @@ export default function TabImportar({ setTab }) {
 
     const confirmImport = (goToCost = false) => {
         if (!editP) return;
+        const qRef = editP.q !== undefined ? editP.q : 1;
         const newItem = {
             id: Date.now().toString(),
             n: editP.codigo || `C${itens.length + 1}`,
             d: editP.titulo || "Composição importada",
             u: editP.unidade || "m²",
-            q: editP.q !== undefined ? editP.q : 1,
+            q: qRef,
             m: editP.mat,
             mo: editP.mo,
             e: editP.eq,
@@ -48,6 +49,44 @@ export default function TabImportar({ setTab }) {
             composicao_raw: compText,
         };
         setItens((p) => [...p, newItem]);
+
+        // Aggregate Single Insumos
+        if (editP.insumos && editP.insumos.length > 0) {
+            const newMats = [];
+            editP.insumos.forEach(insumo => {
+                if (insumo.cat === "Mat" || insumo.cat === "Material") {
+                    newMats.push({
+                        id: "f" + Date.now() + "_" + Math.random().toString(36).substr(2, 4),
+                        n: insumo.desc,
+                        i: editP.codigo || "Importado",
+                        u: insumo.unid || "un",
+                        q: (insumo.qtd || 0) * qRef,
+                        p: insumo.preco || 0
+                    });
+                }
+            });
+            if (newMats.length > 0) setMatFix((p) => [...p, ...newMats]);
+        }
+
+        // Aggregate Histogram HH (8h per day)
+        setEquipes((prev) => {
+            const newEq = JSON.parse(JSON.stringify(prev));
+            if (newEq.length > 0) {
+                const diasProf = Math.ceil((editP.hhp * qRef) / 8) || 0;
+                const diasAju = Math.ceil((editP.hha * qRef) / 8) || 0;
+                const l = newEq[0].l;
+                const pIdx = l.findIndex(x => x.f.toLowerCase().includes("profissional") || x.f.toLowerCase().includes("pedreiro"));
+                const aIdx = l.findIndex(x => x.f.toLowerCase().includes("ajudante"));
+
+                if (pIdx >= 0) l[pIdx].di += diasProf;
+                else if (diasProf > 0) l.push({ f: "Profissional", d: 185, p: 1, di: diasProf });
+
+                if (aIdx >= 0) l[aIdx].di += diasAju;
+                else if (diasAju > 0) l.push({ f: "Ajudante", d: 165, p: 1, di: diasAju });
+            }
+            return newEq;
+        });
+
         setImpHist((p) => [...p, { ...editP }]);
         setParsed(null);
         setEditP(null);
@@ -69,17 +108,22 @@ export default function TabImportar({ setTab }) {
         }
     };
 
-    const handleBatchImportAll = (onImport) => {
+    const handleBatchImportAll = () => {
         if (!batchResults) return;
         const imported = [];
+        const materiaisMap = new Map();
+        let totalHHP = 0;
+        let totalHHA = 0;
+
         batchResults.compositions.forEach((comp) => {
             if (comp.parsed) {
+                const qRef = comp.q !== undefined ? comp.q : 1;
                 const item = {
                     id: Date.now().toString() + "_" + Math.random().toString(36).substr(2, 4),
                     n: comp.codigo || "",
                     d: comp.titulo || "Composição importada",
                     u: comp.unidade || "m²",
-                    q: comp.q !== undefined ? comp.q : 1,
+                    q: qRef,
                     m: comp.mat,
                     mo: comp.mo,
                     e: comp.eq,
@@ -88,14 +132,69 @@ export default function TabImportar({ setTab }) {
                     composicao_raw: comp.raw,
                 };
                 imported.push(item);
+
+                // Aggregate HHP and HHA
+                totalHHP += (comp.hhp || 0) * qRef;
+                totalHHA += (comp.hha || 0) * qRef;
+
+                // Aggregate Insumos
+                if (comp.insumos && comp.insumos.length > 0) {
+                    comp.insumos.forEach(insumo => {
+                        if (insumo.cat === "Mat" || insumo.cat === "Material") {
+                            const key = insumo.desc.toLowerCase().trim();
+                            const qtyTotal = (insumo.qtd || 0) * qRef;
+                            if (materiaisMap.has(key)) {
+                                const existing = materiaisMap.get(key);
+                                existing.q += qtyTotal;
+                            } else {
+                                materiaisMap.set(key, {
+                                    id: "f" + Date.now() + "_" + Math.random().toString(36).substr(2, 4),
+                                    n: insumo.desc,
+                                    i: comp.codigo || "Importado",
+                                    u: insumo.unid || "un",
+                                    q: qtyTotal,
+                                    p: insumo.preco || 0
+                                });
+                            }
+                        }
+                    });
+                }
             }
         });
+
         if (imported.length > 0) {
             setItens((p) => [...p, ...imported]);
             setBatchImported(imported);
             setImpHist((h) => [...h, ...imported.map(it => ({
                 codigo: it.n, titulo: it.d, mat: it.m, mo: it.mo, eq: it.e, hhp: it.hp, ha: it.ha
             }))]);
+
+            // Set Materiais
+            if (materiaisMap.size > 0) {
+                const novosMateriais = Array.from(materiaisMap.values());
+                setMatFix((prev) => [...prev, ...novosMateriais]);
+            }
+
+            // Set Histogram
+            if (totalHHP > 0 || totalHHA > 0) {
+                setEquipes((prev) => {
+                    const newEq = JSON.parse(JSON.stringify(prev));
+                    if (newEq.length > 0) {
+                        const diasProf = Math.ceil(totalHHP / 8) || 0;
+                        const diasAju = Math.ceil(totalHHA / 8) || 0;
+                        const l = newEq[0].l;
+                        const pIdx = l.findIndex(x => x.f.toLowerCase().includes("profissional") || x.f.toLowerCase().includes("pedreiro"));
+                        const aIdx = l.findIndex(x => x.f.toLowerCase().includes("ajudante"));
+
+                        if (pIdx >= 0) l[pIdx].di += diasProf;
+                        else if (diasProf > 0) l.push({ f: "Profissional", d: 185, p: 1, di: diasProf });
+
+                        if (aIdx >= 0) l[aIdx].di += diasAju;
+                        else if (diasAju > 0) l.push({ f: "Ajudante", d: 165, p: 1, di: diasAju });
+                    }
+                    return newEq;
+                });
+            }
         }
     };
 
@@ -345,13 +444,7 @@ export default function TabImportar({ setTab }) {
                     ) : (
                         <div style={{ display: "flex", gap: 8 }}>
                             <button
-                                onClick={() => handleBatchImportAll((items) => {
-                                    // Use confirmImport per item — we need parent to handle batch
-                                    if (batchImport) {
-                                        batchImport(items);
-                                        setBatchImported(items);
-                                    }
-                                })}
+                                onClick={handleBatchImportAll}
                                 disabled={batchResults.compositions.filter(c => c.parsed).length === 0}
                                 style={{
                                     padding: "8px 22px", borderRadius: 5, border: "none",
