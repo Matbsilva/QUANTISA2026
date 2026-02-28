@@ -24,17 +24,20 @@ export async function POST(request) {
             );
         }
 
-        const refPath = path.join(process.cwd(), "..", "_referencia", "ARQUIVOS BASE");
+        const promptsPath = path.join(process.cwd(), "prompts");
 
+        let systemInst = "";
         let prompt4Text = "";
         try {
-            prompt4Text = await fs.readFile(path.join(refPath, "PROMPT-4-ABC-REAL-EV-CRONOGRAMA-RISCOS-v3.0.md"), "utf-8");
+            systemInst = await fs.readFile(path.join(promptsPath, "SYSTEM-INSTRUCTION-QUANTISA.md"), "utf-8");
+            prompt4Text = await fs.readFile(path.join(promptsPath, "PROMPT-4-ABC-RISCOS.md"), "utf-8");
         } catch (e) {
             console.warn("Could not load Prompt 4 from disk, using fallback...", e);
+            systemInst = "Você é o QUANTISA-AI.";
             prompt4Text = "Gere análise ABC, Engenharia de Valor, Cronograma e Riscos.";
         }
 
-        const SYSTEM_PROMPT = `Você é o QUANTISA-AI.
+        const SYSTEM_PROMPT = `${systemInst}
 Sua missão é gerar o PROMPT-4 (ABC REAL + EV COMPLETA + CRONOGRAMA + ANÁLISE DE EQUIPE E RISCOS).
 
 AS REGRAS E O FORMATO DE SAÍDA OBRIGATÓRIOS FORAM DEFINIDOS AQUI:

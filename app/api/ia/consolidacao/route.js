@@ -24,23 +24,25 @@ export async function POST(request) {
             );
         }
 
-        // 1. Load the Prompts from the _referencia folder
-        const refPath = path.join(process.cwd(), "..", "_referencia", "ARQUIVOS BASE");
+        // 1. Load the Prompts from the local prompts folder
+        const promptsPath = path.join(process.cwd(), "prompts");
 
+        let instrucaoGabriel = "";
         let prompt3Text = "";
         let prompt6Text = "";
 
         try {
-            prompt3Text = await fs.readFile(path.join(refPath, "PROMPT-3-CONSOLIDAÇÃO-GEFORCE-v4.6.md"), "utf-8");
-            prompt6Text = await fs.readFile(path.join(refPath, "PROMPT-6-TEXTOS-COMERCIAIS-GEFORCE-v4.0.md"), "utf-8");
+            instrucaoGabriel = await fs.readFile(path.join(promptsPath, "INSTRUCAO-GABRIEL.md"), "utf-8");
+            prompt3Text = await fs.readFile(path.join(promptsPath, "PROMPT-3-CONSOLIDACAO.md"), "utf-8");
+            prompt6Text = await fs.readFile(path.join(promptsPath, "PROMPT-6-TEXTOS-COMERCIAIS.md"), "utf-8");
         } catch (e) {
             console.warn("Could not load real Prompts from disk, using fallback...", e);
+            instrucaoGabriel = "Você é o QUANTISA-AI, um Engenheiro de Custos Sênior atuando no padrão Geforce Engenharia.\nSua missão é gerar a CONSOLIDAÇÃO metodológica em 4 Fases e OS TEXTOS COMERCIAIS para envio ao cliente.";
             prompt3Text = "Gere a consolidação técnica de custos focada em HH e Mão de obra.";
             prompt6Text = "Gere a proposta comercial baseada nos dados fornecidos.";
         }
 
-        const SYSTEM_PROMPT = `Você é o QUANTISA-AI, um Engenheiro de Custos Sênior atuando no padrão Geforce Engenharia.
-Sua missão é gerar a CONSOLIDAÇÃO metodológica em 4 Fases e OS TEXTOS COMERCIAIS para envio ao cliente.
+        const SYSTEM_PROMPT = `${instrucaoGabriel}
 
 AS DUAS REGRAS DE OURO DA GEFORCE FORAM DEFINIDAS AQUI:
 --- REGRA DE CONSOLIDAÇÃO ---

@@ -24,17 +24,20 @@ export async function POST(request) {
             );
         }
 
-        const refPath = path.join(process.cwd(), "..", "_referencia", "ARQUIVOS BASE");
+        const promptsPath = path.join(process.cwd(), "prompts");
 
+        let systemInst = "";
         let prompt7Text = "";
         try {
-            prompt7Text = await fs.readFile(path.join(refPath, "PROMPT-7-MEMORIAL-DESCRITIVO-v1.0.md"), "utf-8");
+            systemInst = await fs.readFile(path.join(promptsPath, "SYSTEM-INSTRUCTION-QUANTISA.md"), "utf-8");
+            prompt7Text = await fs.readFile(path.join(promptsPath, "PROMPT-7-MEMORIAL.md"), "utf-8");
         } catch (e) {
             console.warn("Could not load Prompt 7 from disk, using fallback...", e);
+            systemInst = "Você é o QUANTISA-AI.";
             prompt7Text = "Gere o Memorial Descritivo de todo o orçamento.";
         }
 
-        const SYSTEM_PROMPT = `Você é o QUANTISA-AI.
+        const SYSTEM_PROMPT = `${systemInst}
 Sua missão é gerar o PROMPT-7 (MEMORIAL DESCRITIVO).
 
 AS REGRAS E O FORMATO DE SAÍDA OBRIGATÓRIOS FORAM DEFINIDOS AQUI:

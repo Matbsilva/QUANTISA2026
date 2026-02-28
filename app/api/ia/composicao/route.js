@@ -24,16 +24,16 @@ export async function POST(request) {
             );
         }
 
-        const refPath = path.join(process.cwd(), "..", "_referencia", "ARQUIVOS BASE");
+        const promptsPath = path.join(process.cwd(), "prompts");
 
         let systemInst = "";
         let biblioteca = "";
         let prompt2Text = "";
 
         try {
-            systemInst = await fs.readFile(path.join(refPath, "SYSTEM-INSTRUCTION-QUANTISA-v4.6.md"), "utf-8");
-            biblioteca = await fs.readFile(path.join(refPath, "BIBLIOTECA-INSUMOS-v7.md"), "utf-8");
-            prompt2Text = await fs.readFile(path.join(refPath, "PROMPT-2-COMPOSICOES-v7.3.md"), "utf-8");
+            systemInst = await fs.readFile(path.join(promptsPath, "INSTRUCAO-MARCUS.md"), "utf-8");
+            biblioteca = await fs.readFile(path.join(promptsPath, "BIBLIOTECA-INSUMOS.md"), "utf-8");
+            prompt2Text = await fs.readFile(path.join(promptsPath, "PROMPT-2-COMPOSICOES.md"), "utf-8");
         } catch (e) {
             console.warn("Could not load one or more Prompt files from disk.", e);
         }
